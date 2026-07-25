@@ -14,7 +14,6 @@
 
     <style>
         :root {
-            /* Fundo com mais rosa suave */
             --bg-main: #FAF0F4;
             --bg-card: #FFFFFF;
             --bg-secondary: #F7E4EC;
@@ -43,19 +42,16 @@
         h1, h2, h3 { font-weight: 600; letter-spacing: -0.02em; }
         p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; }
 
-        /* Header Bar */
         .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: rgba(250, 240, 244, 0.92); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--border-color); }
         .greeting-subtitle { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary-pink-dark); font-weight: 700; }
         .greeting-title { font-size: 1.25rem; color: var(--text-primary); }
         .highlight-name { color: var(--primary-pink-dark); }
         .avatar-container { width: 42px; height: 42px; border-radius: var(--border-radius-full); background: linear-gradient(135deg, var(--primary-pink), var(--primary-pink-dark)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.1rem; box-shadow: var(--shadow-card); cursor: pointer; border: 2px solid #FFF; }
 
-        /* Viewport Layout */
         .viewport { padding: 12px 20px 30px; max-width: 600px; margin: 0 auto; }
         .view-screen { animation: fadeInSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes fadeInSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* UI Components */
         .card { background: var(--bg-card); border-radius: var(--border-radius-m); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .card-title { font-size: 1.05rem; display: flex; align-items: center; gap: 8px; color: var(--text-primary); }
@@ -80,34 +76,27 @@
         .btn-primary { width: 100%; background: linear-gradient(135deg, var(--primary-pink), var(--primary-pink-dark)); color: white; border: none; padding: 14px; border-radius: var(--border-radius-m); font-weight: 600; font-size: 0.95rem; box-shadow: var(--shadow-floating); cursor: pointer; margin-top: 8px; }
         .btn-primary:active { transform: scale(0.98); }
 
-        /* Select / Dropdown para Treinos */
         .select-custom { width: 100%; padding: 12px; border-radius: var(--border-radius-s); border: 1px solid var(--border-color); background: white; font-family: inherit; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; outline: none; cursor: pointer; box-shadow: var(--shadow-card); }
 
-        /* Calendário Horizonal */
-        .calendar-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
-        .day-card { flex: 0 0 auto; width: 55px; padding: 10px 0; text-align: center; background: white; border-radius: var(--border-radius-s); border: 1px solid var(--border-color); cursor: pointer; }
+        .calendar-bar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
+        .day-card { flex: 1; min-width: 44px; padding: 10px 0; text-align: center; background: white; border-radius: var(--border-radius-s); border: 1px solid var(--border-color); cursor: pointer; }
         .day-card.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
-        .day-card.active .day-num, .day-card.active .day-name { color: white; }
-        .day-name { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
-        .day-num { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-top: 2px; }
+        .day-card.active .day-name { color: white; }
+        .day-name { font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); }
 
-        /* Water Animation */
         .water-bottle { height: 160px; width: 90px; border: 3px solid var(--water-blue); border-radius: 20px; margin: 15px auto; position: relative; overflow: hidden; background: #FFF; }
         .water-fill { position: absolute; bottom: 0; width: 100%; background: linear-gradient(180deg, #A5F3FC, var(--water-blue)); transition: height 0.5s ease; }
 
-        /* Navigation */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 72px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 100; }
         .nav-item { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.7rem; font-weight: 600; cursor: pointer; width: 20%; }
         .nav-item svg { width: 22px; height: 22px; stroke: var(--text-muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .nav-item.active { color: var(--primary-pink-dark); }
         .nav-item.active svg { stroke: var(--primary-pink-dark); }
 
-        /* Subtabs para Nutrição */
         .subtabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
         .subtab-btn { background: white; border: 1px solid var(--border-color); padding: 8px 16px; border-radius: var(--border-radius-full); font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; cursor: pointer; }
         .subtab-btn.active { background: var(--primary-pink-dark); color: white; border-color: var(--primary-pink-dark); }
 
-        /* Toast */
         .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: white; padding: 10px 20px; border-radius: var(--border-radius-full); font-size: 0.85rem; z-index: 200; display: none; box-shadow: var(--shadow-floating); }
     </style>
 </head>
@@ -116,7 +105,7 @@
     <header class="top-bar">
         <div>
             <span class="greeting-subtitle">Projeto fitness da Van</span>
-            <h1 class="greeting-title" id="current-date-title">Carregando...</h1>
+            <h1 class="greeting-title" id="current-date-title">Segunda-Feira</h1>
         </div>
         <div class="avatar-container" onclick="app.nav('perfil')">V</div>
     </header>
@@ -151,11 +140,31 @@
         const DB = {
             user: { name: 'Vanessa', age: 27, height: '1.52m', weight: 60, targetWeight: 50 },
             water: { current: 750, target: 2000 },
-            selectedDayOffset: 0,
+            selectedDayKey: 'segunda',
             selectedNutriTab: 'pretreino',
             selectedWorkoutDay: 'segunda',
             workoutProgress: {},
             checklistState: {}
+        };
+
+        const weekDaysList = [
+            { key: 'segunda', label: 'Seg' },
+            { key: 'terca', label: 'Ter' },
+            { key: 'quarta', label: 'Qua' },
+            { key: 'quinta', label: 'Qui' },
+            { key: 'sexta', label: 'Sex' },
+            { key: 'sabado', label: 'Sab' },
+            { key: 'domingo', label: 'Dom' }
+        ];
+
+        const dayFullNames = {
+            segunda: 'Segunda-Feira',
+            terca: 'Terça-Feira',
+            quarta: 'Quarta-Feira',
+            quinta: 'Quinta-Feira',
+            sexta: 'Sexta-Feira',
+            sabado: 'Sábado',
+            domingo: 'Domingo'
         };
 
         const workoutsData = {
@@ -263,10 +272,7 @@
             },
 
             updateDateHeader() {
-                const d = new Date();
-                d.setDate(d.getDate() + DB.selectedDayOffset);
-                const options = { weekday: 'short', day: 'numeric', month: 'short' };
-                document.getElementById('current-date-title').innerText = d.toLocaleDateString('pt-BR', options);
+                document.getElementById('current-date-title').innerText = dayFullNames[DB.selectedDayKey];
             },
 
             nav(screen) {
@@ -278,15 +284,15 @@
                 vp.innerHTML = `<div class="view-screen">${this.screens[screen]()}</div>`;
             },
 
-            selectDay(offset) {
-                DB.selectedDayOffset = offset;
+            selectWeekDay(dayKey) {
+                DB.selectedDayKey = dayKey;
                 this.saveDB();
                 this.updateDateHeader();
                 this.nav('dashboard');
             },
 
             toggleDailyTask(taskId) {
-                const key = `day_${DB.selectedDayOffset}_${taskId}`;
+                const key = `day_${DB.selectedDayKey}_${taskId}`;
                 DB.checklistState[key] = !DB.checklistState[key];
                 this.saveDB();
                 this.nav('dashboard');
@@ -316,19 +322,15 @@
                 this.nav('treinos');
             },
 
-            getDailyTasks() {
-                const targetDate = new Date();
-                targetDate.setDate(targetDate.getDate() + DB.selectedDayOffset);
-                const dayOfWeek = targetDate.getDay(); // 0: Dom, 1: Seg, 2: Ter, 3: Qua, 4: Qui, 5: Sex, 6: Sab
-
+            getDailyTasks(dayKey) {
                 let workoutTitle = "Treino do Dia";
-                if (dayOfWeek === 1) workoutTitle = "Treino: Glúteo Máximo & Posterior";
-                else if (dayOfWeek === 2) workoutTitle = "Treino: Costas • Bíceps • Ombros";
-                else if (dayOfWeek === 3) workoutTitle = "Treino: Quadríceps & Glúteo Médio";
-                else if (dayOfWeek === 4) workoutTitle = "Treino: Costas • Braços • Core";
-                else if (dayOfWeek === 5) workoutTitle = "Descanso Ativo & Mobilidade";
-                else if (dayOfWeek === 6) workoutTitle = "Treino: Glúteo Pump";
-                else if (dayOfWeek === 0) workoutTitle = "Descanso Total & Recuperação";
+                if (dayKey === 'segunda') workoutTitle = "Treino: Glúteo Máximo & Posterior";
+                else if (dayKey === 'terca') workoutTitle = "Treino: Costas • Bíceps • Ombros";
+                else if (dayKey === 'quarta') workoutTitle = "Treino: Quadríceps & Glúteo Médio";
+                else if (dayKey === 'quinta') workoutTitle = "Treino: Costas • Braços • Core";
+                else if (dayKey === 'sexta') workoutTitle = "Descanso Ativo & Mobilidade";
+                else if (dayKey === 'sabado') workoutTitle = "Treino: Glúteo Pump";
+                else if (dayKey === 'domingo') workoutTitle = "Descanso Total & Recuperação";
 
                 return [
                     { id: 'water', text: `Meta de Água (${DB.water.target}ml)` },
@@ -343,29 +345,22 @@
 
             screens: {
                 dashboard() {
-                    const tasks = app.getDailyTasks();
+                    const tasks = app.getDailyTasks(DB.selectedDayKey);
                     let completed = 0;
                     tasks.forEach(t => {
-                        const key = `day_${DB.selectedDayOffset}_${t.id}`;
+                        const key = `day_${DB.selectedDayKey}_${t.id}`;
                         if (DB.checklistState[key]) completed++;
                     });
                     const pct = Math.round((completed / tasks.length) * 100);
 
-                    // Gerar os dias do calendário (-2 até +4 dias)
-                    let calHTML = '';
-                    for (let i = -2; i <= 4; i++) {
-                        const d = new Date();
-                        d.setDate(d.getDate() + i);
-                        const dayName = d.toLocaleDateString('pt-BR', { weekday: 'narrow' });
-                        const dayNum = d.getDate();
-                        const isActive = i === DB.selectedDayOffset ? 'active' : '';
-                        calHTML += `
-                            <div class="day-card ${isActive}" onclick="app.selectDay(${i})">
-                                <div class="day-name">${dayName}</div>
-                                <div class="day-num">${dayNum}</div>
+                    const calHTML = weekDaysList.map(item => {
+                        const isActive = item.key === DB.selectedDayKey ? 'active' : '';
+                        return `
+                            <div class="day-card ${isActive}" onclick="app.selectWeekDay('${item.key}')">
+                                <div class="day-name">${item.label}</div>
                             </div>
                         `;
-                    }
+                    }).join('');
 
                     return `
                         <div class="calendar-bar">
@@ -382,14 +377,14 @@
                             </div>
                             <div>
                                 <h3>Progresso do Dia</h3>
-                                <p style="font-size:0.85rem">${completed} de ${tasks.length} tarefas concluídas no dia selecionado.</p>
+                                <p style="font-size:0.85rem">${completed} de ${tasks.length} tarefas concluídas (${dayFullNames[DB.selectedDayKey]}).</p>
                             </div>
                         </div>
 
                         <div class="card">
                             <div class="card-header"><h3 class="card-title">Checklist Diário</h3></div>
                             ${tasks.map(t => {
-                                const key = `day_${DB.selectedDayOffset}_${t.id}`;
+                                const key = `day_${DB.selectedDayKey}_${t.id}`;
                                 const isDone = !!DB.checklistState[key];
                                 return `
                                     <div class="check-item ${isDone ? 'completed' : ''}" onclick="app.toggleDailyTask('${t.id}')">
