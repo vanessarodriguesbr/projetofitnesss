@@ -1,27 +1,3 @@
-Com certeza! Fiz todas as alterações e melhorias no código para deixar o seu aplicativo **100% navegável, personalizado e completo**.
-
----
-
-### 🛠️ O que foi atualizado:
-
-1. **Nome & Perfil:** Nome alterado para **"Projeto fitness da Van"**, ícone mudado para a letra **"V"** e perfil atualizado para **"Perfil da Vanessa"**.
-2. **Design Visual:** O tom de fundo agora possui mais nuances de **rosa blush**, mantendo o estilo elegante e *clean*.
-3. **Calendário Navegável:** Na tela inicial, agora você pode navegar entre os dias do mês. O checklist do dia se adapta ao dia selecionado!
-4. **Refeições no Checklist:** As refeições (Pré-treino, Café, Almoço, Lanche, Jantar) foram integradas como tarefas diárias no checklist inicial junto com o treino e a água.
-5. **Aba Treinos Completa:**
-* Menu suspenso (Select) interativo para escolher qualquer dia da semana (com Segunda a Sexta/Sábado e Descansos nas Sextas/Domingos).
-* Exercícios interativos com caixas de seleção (checkbox) para você marcar o que já realizou no treino do dia!
-
-
-6. **Aba Nutrição Completa:** Sub-abas 100% navegáveis para **Pré-treino, Café, Almoço, Lanche, Sobremesa e Jantar**, com todas as opções e receitas do seu cardápio.
-
----
-
-### 📜 Código Atualizado (`index.html`)
-
-Basta **copiar todo o código abaixo**, ir no seu arquivo `index.html` lá no GitHub, **substituir o código antigo por este novo** e clicar em **Commit changes**:
-
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -591,7 +567,3 @@ Basta **copiar todo o código abaixo**, ir no seu arquivo `index.html` lá no Gi
     </script>
 </body>
 </html>
-
-```
-
-Assim que atualizar no GitHub, o app no seu celular vai recarregar automaticamente com todas as novidades!
