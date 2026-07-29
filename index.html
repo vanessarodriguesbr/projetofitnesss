@@ -65,16 +65,15 @@
         .stat-val { font-size: 1.15rem; font-weight: 700; color: var(--primary-pink-dark); }
         .stat-lbl { font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; }
 
-        /* Checklist com Arrastar & Soltar */
-        .check-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--bg-main); border-radius: var(--border-radius-s); margin-bottom: 8px; transition: var(--transition-fast); border: 1px solid transparent; gap: 10px; cursor: grab; }
-        .check-item:active { cursor: grabbing; }
-        .check-item.dragging { opacity: 0.4; border: 2px dashed var(--primary-pink); background: white; }
+        /* Checklist Interativo com Suporte a Touch & Drag */
+        .check-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--bg-main); border-radius: var(--border-radius-s); margin-bottom: 8px; transition: transform 0.15s ease, background-color 0.2s ease; border: 1px solid transparent; gap: 10px; touch-action: none; }
+        .check-item.dragging { opacity: 0.6; transform: scale(1.02); border: 2px dashed var(--primary-pink); background: white; box-shadow: var(--shadow-floating); z-index: 10; }
         .check-item.completed { background: var(--primary-pink-light); }
         .check-item.completed .check-txt { text-decoration: line-through; color: var(--text-muted); }
         .check-content { display: flex; align-items: center; gap: 12px; flex: 1; }
         .checkbox { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--primary-pink); background: white; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0; cursor: pointer; }
         .check-item.completed .checkbox { background: var(--primary-pink); color: white; }
-        .drag-handle { color: var(--text-muted); font-size: 1rem; letter-spacing: -2px; padding: 0 4px; cursor: grab; }
+        .drag-handle { color: var(--primary-pink-dark); font-size: 1.2rem; padding: 4px 8px; cursor: grab; font-weight: bold; }
 
         .btn-primary { width: 100%; background: linear-gradient(135deg, var(--primary-pink), var(--primary-pink-dark)); color: white; border: none; padding: 14px; border-radius: var(--border-radius-m); font-weight: 600; font-size: 0.95rem; box-shadow: var(--shadow-floating); cursor: pointer; margin-top: 8px; }
         .btn-primary:active { transform: scale(0.98); }
@@ -351,6 +350,7 @@
             }
         };
 
+        // Variáveis de controle de drag/touch
         let draggedIndex = null;
 
         const app = {
@@ -363,7 +363,7 @@
             loadDB() {
                 const saved = localStorage.getItem('van_fitness_db');
                 if (saved) Object.assign(DB, JSON.parse(saved));
-                DB.water.target = 3000; // Assegurar meta de 3L
+                DB.water.target = 3000;
             },
 
             saveDB() {
@@ -404,16 +404,62 @@
                 this.nav('dashboard');
             },
 
-            // Drag & Drop Handlers
+            // Lógica de Reordenação por Toque e Arraste
+            initTouchReorder() {
+                const container = document.getElementById('checklist-container');
+                if (!container) return;
+
+                let activeItem = null;
+                let initialY = 0;
+
+                const items = container.querySelectorAll('.check-item');
+                items.forEach((item, index) => {
+                    item.addEventListener('touchstart', (e) => {
+                        activeItem = item;
+                        draggedIndex = index;
+                        initialY = e.touches[0].clientY;
+                        item.classList.add('dragging');
+                    }, { passive: true });
+
+                    item.addEventListener('touchmove', (e) => {
+                        if (!activeItem) return;
+                        const currentY = e.touches[0].clientY;
+                        const targetElement = document.elementFromPoint(e.touches[0].clientX, currentY);
+                        const targetItem = targetElement ? targetElement.closest('.check-item') : null;
+
+                        if (targetItem && targetItem !== activeItem) {
+                            const targetIndex = parseInt(targetItem.getAttribute('data-index'));
+                            if (!isNaN(targetIndex) && targetIndex !== draggedIndex) {
+                                const tasks = app.getDailyTasks(DB.selectedDayKey);
+                                const draggedTask = tasks[draggedIndex];
+                                tasks.splice(draggedIndex, 1);
+                                tasks.splice(targetIndex, 0, draggedTask);
+                                DB.customTasksOrder[DB.selectedDayKey] = tasks;
+                                app.saveDB();
+                                draggedIndex = targetIndex;
+                                app.nav('dashboard');
+                            }
+                        }
+                    }, { passive: true });
+
+                    item.addEventListener('touchend', () => {
+                        if (activeItem) {
+                            activeItem.classList.remove('dragging');
+                            activeItem = null;
+                            draggedIndex = null;
+                        }
+                    });
+                });
+            },
+
+            // Suporte para Mouse (Desktop)
             handleDragStart(e, index) {
                 draggedIndex = index;
                 e.currentTarget.classList.add('dragging');
-                e.dataTransfer.effectAllowed = 'move';
             },
 
             handleDragOver(e) {
                 e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
             },
 
             handleDrop(e, targetIndex) {
@@ -507,6 +553,8 @@
                         `;
                     }).join('');
 
+                    setTimeout(() => app.initTouchReorder(), 100);
+
                     return `
                         <div class="calendar-bar">
                             ${calHTML}
@@ -529,26 +577,29 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">Checklist Diário</h3>
-                                <span style="font-size:0.75rem; color:var(--text-muted);">Arraste para reordenar</span>
+                                <span style="font-size:0.75rem; color:var(--text-muted);">Toque e arraste para reordenar</span>
                             </div>
-                            ${tasks.map((t, idx) => {
-                                const key = `day_${DB.selectedDayKey}_${t.id}`;
-                                const isDone = !!DB.checklistState[key];
-                                return `
-                                    <div class="check-item ${isDone ? 'completed' : ''}"
-                                         draggable="true"
-                                         ondragstart="app.handleDragStart(event, ${idx})"
-                                         ondragover="app.handleDragOver(event)"
-                                         ondrop="app.handleDrop(event, ${idx})"
-                                         ondragend="app.handleDragEnd(event)">
-                                        <div class="check-content">
-                                            <div class="checkbox" onclick="event.stopPropagation(); app.toggleDailyTask('${t.id}')">${isDone ? '✓' : ''}</div>
-                                            <span class="check-txt" onclick="app.toggleDailyTask('${t.id}')">${t.text}</span>
+                            <div id="checklist-container">
+                                ${tasks.map((t, idx) => {
+                                    const key = `day_${DB.selectedDayKey}_${t.id}`;
+                                    const isDone = !!DB.checklistState[key];
+                                    return `
+                                        <div class="check-item ${isDone ? 'completed' : ''}"
+                                             data-index="${idx}"
+                                             draggable="true"
+                                             ondragstart="app.handleDragStart(event, ${idx})"
+                                             ondragover="app.handleDragOver(event)"
+                                             ondrop="app.handleDrop(event, ${idx})"
+                                             ondragend="app.handleDragEnd(event)">
+                                            <div class="check-content">
+                                                <div class="checkbox" onclick="event.stopPropagation(); app.toggleDailyTask('${t.id}')">${isDone ? '✓' : ''}</div>
+                                                <span class="check-txt" onclick="app.toggleDailyTask('${t.id}')">${t.text}</span>
+                                            </div>
+                                            <div class="drag-handle">☰</div>
                                         </div>
-                                        <div class="drag-handle">⋮⋮</div>
-                                    </div>
-                                `;
-                            }).join('')}
+                                    `;
+                                }).join('')}
+                            </div>
                         </div>
 
                         <div class="grid-2">
