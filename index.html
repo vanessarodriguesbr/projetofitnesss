@@ -89,10 +89,10 @@
         .water-bottle { height: 160px; width: 90px; border: 3px solid var(--water-blue); border-radius: 20px; margin: 15px auto; position: relative; overflow: hidden; background: #FFF; }
         .water-fill { position: absolute; bottom: 0; width: 100%; background: linear-gradient(180deg, #A5F3FC, var(--water-blue)); transition: height 0.5s ease; }
 
-        /* Navegação */
+        /* Navegação Ajustada para 7 Itens */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 72px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 100; }
-        .nav-item { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.68rem; font-weight: 600; cursor: pointer; width: 16.6%; }
-        .nav-item svg { width: 20px; height: 20px; stroke: var(--text-muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .nav-item { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.62rem; font-weight: 600; cursor: pointer; flex: 1; }
+        .nav-item svg { width: 19px; height: 19px; stroke: var(--text-muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .nav-item.active { color: var(--primary-pink-dark); }
         .nav-item.active svg { stroke: var(--primary-pink-dark); }
 
@@ -133,6 +133,10 @@
             <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
             <span>Água</span>
         </button>
+        <button class="nav-item" onclick="app.nav('espiritual')">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Espiritual</span>
+        </button>
         <button class="nav-item" onclick="app.nav('financeiro')">
             <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             <span>Finanças</span>
@@ -151,6 +155,7 @@
             selectedNutriTab: 'pretreino',
             selectedWorkoutDay: 'segunda',
             selectedFinanceMonth: 'jan',
+            selectedRosaryDay: 'segunda',
             workoutProgress: {},
             checklistState: {},
             customTasksOrder: {},
@@ -177,34 +182,91 @@
             domingo: 'Domingo'
         };
 
+        const rosaryData = {
+            segunda: {
+                title: "Mistérios Gozosos",
+                items: [
+                    "1. A Anunciação do Anjo Gabriel a Maria.",
+                    "2. A Visitação de Maria a Santa Isabel.",
+                    "3. O Nascimento de Jesus em Belém.",
+                    "4. A Apresentação do Menino Jesus no Templo.",
+                    "5. O Encontro do Menino Jesus entre os Doutores da Lei."
+                ]
+            },
+            terca: {
+                title: "Mistérios Dolorosos",
+                items: [
+                    "1. A Agonia de Jesus no Horto das Oliveiras.",
+                    "2. A Flagelação de Jesus.",
+                    "3. A Coroação de Espinhos.",
+                    "4. Jesus carrega a Cruz até o Calvário.",
+                    "5. A Crucificação e Morte de Jesus."
+                ]
+            },
+            quarta: {
+                title: "Mistérios Gloriosos",
+                items: [
+                    "1. A Ressurreição de Jesus.",
+                    "2. A Ascensão de Jesus ao Céu.",
+                    "3. A Vinda do Espírito Santo em Pentecostes.",
+                    "4. A Assunção de Maria ao Céu.",
+                    "5. A Coroação de Maria como Rainha do Céu e da Terra."
+                ]
+            },
+            quinta: {
+                title: "Mistérios Luminosos",
+                items: [
+                    "1. O Batismo de Jesus no Rio Jordão.",
+                    "2. A Auto-revelação de Jesus nas Bodas de Caná.",
+                    "3. O Anúncio do Reino de Deus e o Convite à Conversão.",
+                    "4. A Transfiguração de Jesus no Monte Tabor.",
+                    "5. A Instituição da Eucaristia na Última Ceia."
+                ]
+            },
+            sexta: {
+                title: "Mistérios Dolorosos",
+                items: [
+                    "1. A Agonia de Jesus no Horto das Oliveiras.",
+                    "2. A Flagelação de Jesus.",
+                    "3. A Coroação de Espinhos.",
+                    "4. Jesus carrega a Cruz até o Calvário.",
+                    "5. A Crucificação e Morte de Jesus."
+                ]
+            },
+            sabado: {
+                title: "Mistérios Gozosos",
+                items: [
+                    "1. A Anunciação do Anjo Gabriel a Maria.",
+                    "2. A Visitação de Maria a Santa Isabel.",
+                    "3. O Nascimento de Jesus em Belém.",
+                    "4. A Apresentação do Menino Jesus no Templo.",
+                    "5. O Encontro do Menino Jesus entre os Doutores da Lei."
+                ]
+            },
+            domingo: {
+                title: "Mistérios Gloriosos",
+                items: [
+                    "1. A Ressurreição de Jesus.",
+                    "2. A Ascensão de Jesus ao Céu.",
+                    "3. A Vinda do Espírito Santo em Pentecostes.",
+                    "4. A Assunção de Maria ao Céu.",
+                    "5. A Coroação de Maria como Rainha do Céu e da Terra."
+                ]
+            }
+        };
+
         const financeMonthsList = [
-            { key: 'jan', label: 'Jan' },
-            { key: 'fev', label: 'Fev' },
-            { key: 'mar', label: 'Mar' },
-            { key: 'abr', label: 'Abr' },
-            { key: 'mai', label: 'Mai' },
-            { key: 'jun', label: 'Jun' },
-            { key: 'jul', label: 'Jul' },
-            { key: 'ago', label: 'Ago' },
-            { key: 'set', label: 'Set' },
-            { key: 'out', label: 'Out' },
-            { key: 'nov', label: 'Nov' },
-            { key: 'dez', label: 'Dez' }
+            { key: 'jan', label: 'Jan' }, { key: 'fev', label: 'Fev' }, { key: 'mar', label: 'Mar' },
+            { key: 'abr', label: 'Abr' }, { key: 'mai', label: 'Mai' }, { key: 'jun', label: 'Jun' },
+            { key: 'jul', label: 'Jul' }, { key: 'ago', label: 'Ago' }, { key: 'set', label: 'Set' },
+            { key: 'out', label: 'Out' }, { key: 'nov', label: 'Nov' }, { key: 'dez', label: 'Dez' }
         ];
 
-        const financeItems = [
-            'Aluguel',
-            'Enel',
-            'Tim',
-            'Vivo',
-            'Comgás',
-            'Flávia',
-            'Nubank',
-            'Itaú'
-        ];
+        const financeItems = ['Aluguel', 'Enel', 'Tim', 'Vivo', 'Comgás', 'Flávia', 'Nubank', 'Itaú'];
 
         const defaultTasksMap = {
             segunda: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Gozosos)' },
                 { id: 'water', text: 'Meta de Água (3000ml)' },
                 { id: 'pre', text: 'Refeição: Pré-treino' },
                 { id: 'workout', text: 'Treino: Glúteo Máximo & Posterior' },
@@ -214,6 +276,7 @@
                 { id: 'jantar', text: 'Refeição: Jantar' }
             ],
             terca: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Dolorosos)' },
                 { id: 'water', text: 'Meta de Água (3000ml)' },
                 { id: 'pre', text: 'Refeição: Pré-treino' },
                 { id: 'workout', text: 'Treino: Costas • Bíceps • Ombros' },
@@ -223,6 +286,7 @@
                 { id: 'jantar', text: 'Refeição: Jantar' }
             ],
             quarta: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Gloriosos)' },
                 { id: 'water', text: 'Meta de Água (3000ml)' },
                 { id: 'pre', text: 'Refeição: Pré-treino' },
                 { id: 'workout', text: 'Treino: Quadríceps & Glúteo Médio' },
@@ -232,6 +296,7 @@
                 { id: 'jantar', text: 'Refeição: Jantar' }
             ],
             quinta: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Luminosos)' },
                 { id: 'water', text: 'Meta de Água (3000ml)' },
                 { id: 'pre', text: 'Refeição: Pré-treino' },
                 { id: 'workout', text: 'Treino: Costas • Braços • Core' },
@@ -241,6 +306,7 @@
                 { id: 'jantar', text: 'Refeição: Jantar' }
             ],
             sexta: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Dolorosos)' },
                 { id: 'water', text: 'Meta de Água (3000ml)' },
                 { id: 'pre', text: 'Refeição: Pré-treino' },
                 { id: 'workout', text: 'Descanso Ativo & Mobilidade' },
@@ -250,6 +316,7 @@
                 { id: 'jantar', text: 'Refeição: Jantar' }
             ],
             sabado: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Gozosos)' },
                 { id: 'water', text: 'Meta de Água (3000ml)' },
                 { id: 'pre', text: 'Refeição: Pré-treino' },
                 { id: 'workout', text: 'Treino: Glúteo Pump' },
@@ -259,6 +326,7 @@
                 { id: 'jantar', text: 'Refeição: Jantar' }
             ],
             domingo: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Gloriosos)' },
                 { id: 'water', text: 'Meta de Água (3000ml)' },
                 { id: 'pre', text: 'Refeição: Pré-treino' },
                 { id: 'workout', text: 'Descanso Total & Recuperação' },
@@ -270,87 +338,15 @@
         };
 
         const workoutsData = {
-            segunda: {
-                title: "Glúteo Máximo & Posterior",
-                desc: "Foco em Força e Carga • 55–65 min",
-                items: [
-                    "Elevação Pélvica (Barra/Máq) - 4x8–12 (2s topo)",
-                    "Agachamento Búlgaro - 3x10–12",
-                    "Bom Dia / Good Morning - 4x10–12",
-                    "Cadeira Flexora - 4x12–15",
-                    "Glúteo Caneleira/Polia - 3x12–15"
-                ]
-            },
-            terca: {
-                title: "Costas • Bíceps • Ombros",
-                desc: "Definição do Tronco + Cardio",
-                items: [
-                    "Puxada Alta Aberta - 4x10–12",
-                    "Remada Baixa Triângulo - 3x12",
-                    "Desenvolvimento Halteres - 3x12",
-                    "Elevação Lateral - 4x12–15",
-                    "Rosca Bíceps - 4x12–15",
-                    "Cardio: 25–30 min"
-                ]
-            },
-            quarta: {
-                title: "Quadríceps & Glúteo Médio",
-                desc: "Foco em Pernas e Lateral do Glúteo",
-                items: [
-                    "Agachamento Halter (Goblet) - 4x10–12",
-                    "Leg Press 45° - 3x10–12",
-                    "Cadeira Extensora - 3x12–15",
-                    "Cadeira Abdutora - 4x15–20",
-                    "Abdução no Cabo - 3x12–15",
-                    "Cardio Bike: 25–30 min"
-                ]
-            },
-            quinta: {
-                title: "Costas • Braços • Core",
-                desc: "Escultura de Tronco e Abdômen",
-                items: [
-                    "Puxada Triângulo - 4x10–12",
-                    "Remada Unilateral (Serrote) - 3x12",
-                    "Face Pull com Corda - 3x15",
-                    "Tríceps Pulley + Rosca Direta - 3x12",
-                    "Prancha Abdominal - 3x45–60s",
-                    "Abdominal Infra - 3x15–20",
-                    "Cardio: 25–30 min"
-                ]
-            },
-            sexta: {
-                title: "Descanso Ativo & Recuperação",
-                desc: "Recuperação Muscular Direcionada",
-                items: [
-                    "Alongamentos Leves",
-                    "Mobilidade de Quadril",
-                    "Hidratação Adicional",
-                    "Sono reparador"
-                ]
-            },
-            sabado: {
-                title: "Glúteo Pump & Posterior",
-                desc: "Modelagem e Exaustão Muscular",
-                items: [
-                    "Elevação Pélvica Unilateral - 3x12",
-                    "Levantamento Terra Sumô - 4x10",
-                    "Passada Caminhando - 3x20 passos",
-                    "Cadeira Flexora - 3x12–15",
-                    "Cadeira Abdutora - 3x20 (Dropset)"
-                ]
-            },
-            domingo: {
-                title: "Descanso Total & Planejamento",
-                desc: "Preparação para a Próxima Semana",
-                items: [
-                    "Resumo semanal de conquistas",
-                    "Organização do Meal Prep / Marmitas",
-                    "Relaxamento e Descanso"
-                ]
-            }
+            segunda: { title: "Glúteo Máximo & Posterior", desc: "Foco em Força e Carga • 55–65 min", items: ["Elevação Pélvica (Barra/Máq) - 4x8–12 (2s topo)", "Agachamento Búlgaro - 3x10–12", "Bom Dia / Good Morning - 4x10–12", "Cadeira Flexora - 4x12–15", "Glúteo Caneleira/Polia - 3x12–15"] },
+            terca: { title: "Costas • Bíceps • Ombros", desc: "Definição do Tronco + Cardio", items: ["Puxada Alta Aberta - 4x10–12", "Remada Baixa Triângulo - 3x12", "Desenvolvimento Halteres - 3x12", "Elevação Lateral - 4x12–15", "Rosca Bíceps - 4x12–15", "Cardio: 25–30 min"] },
+            quarta: { title: "Quadríceps & Glúteo Médio", desc: "Foco em Pernas e Lateral do Glúteo", items: ["Agachamento Halter (Goblet) - 4x10–12", "Leg Press 45° - 3x10–12", "Cadeira Extensora - 3x12–15", "Cadeira Abdutora - 4x15–20", "Abdução no Cabo - 3x12–15", "Cardio Bike: 25–30 min"] },
+            quinta: { title: "Costas • Braços • Core", desc: "Escultura de Tronco e Abdômen", items: ["Puxada Triângulo - 4x10–12", "Remada Unilateral (Serrote) - 3x12", "Face Pull com Corda - 3x15", "Tríceps Pulley + Rosca Direta - 3x12", "Prancha Abdominal - 3x45–60s", "Abdominal Infra - 3x15–20", "Cardio: 25–30 min"] },
+            sexta: { title: "Descanso Ativo & Recuperação", desc: "Recuperação Muscular Direcionada", items: ["Alongamentos Leves", "Mobilidade de Quadril", "Hidratação Adicional", "Sono reparador"] },
+            sabado: { title: "Glúteo Pump & Posterior", desc: "Modelagem e Exaustão Muscular", items: ["Elevação Pélvica Unilateral - 3x12", "Levantamento Terra Sumô - 4x10", "Passada Caminhando - 3x20 passos", "Cadeira Flexora - 3x12–15", "Cadeira Abdutora - 3x20 (Dropset)"] },
+            domingo: { title: "Descanso Total & Planejamento", desc: "Preparação para a Próxima Semana", items: ["Resumo semanal de conquistas", "Organização do Meal Prep / Marmitas", "Relaxamento e Descanso"] }
         };
 
-        // Variáveis de controle de drag/touch
         let draggedIndex = null;
 
         const app = {
@@ -383,7 +379,7 @@
 
             nav(screen) {
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                const btnMap = { dashboard: 0, alimentacao: 1, treinos: 2, agua: 3, financeiro: 4, perfil: 5 };
+                const btnMap = { dashboard: 0, alimentacao: 1, treinos: 2, agua: 3, espiritual: 4, financeiro: 5, perfil: 6 };
                 if (btnMap[screen] !== undefined) document.querySelectorAll('.nav-item')[btnMap[screen]].classList.add('active');
 
                 const vp = document.getElementById('app-viewport');
@@ -404,20 +400,17 @@
                 this.nav('dashboard');
             },
 
-            // Lógica de Reordenação por Toque e Arraste
             initTouchReorder() {
                 const container = document.getElementById('checklist-container');
                 if (!container) return;
 
                 let activeItem = null;
-                let initialY = 0;
 
                 const items = container.querySelectorAll('.check-item');
                 items.forEach((item, index) => {
                     item.addEventListener('touchstart', (e) => {
                         activeItem = item;
                         draggedIndex = index;
-                        initialY = e.touches[0].clientY;
                         item.classList.add('dragging');
                     }, { passive: true });
 
@@ -452,7 +445,6 @@
                 });
             },
 
-            // Suporte para Mouse (Desktop)
             handleDragStart(e, index) {
                 draggedIndex = index;
                 e.currentTarget.classList.add('dragging');
@@ -518,6 +510,12 @@
                 DB.selectedFinanceMonth = monthKey;
                 this.saveDB();
                 this.nav('financeiro');
+            },
+
+            setRosaryDay(dayKey) {
+                DB.selectedRosaryDay = dayKey;
+                this.saveDB();
+                this.nav('espiritual');
             },
 
             toggleFinanceItem(item) {
@@ -749,6 +747,37 @@
                                 <button class="btn-primary" style="background:#FCA5A5" onclick="app.addWater(-250)">-250 ml</button>
                                 <button class="btn-primary" style="background:var(--text-muted)" onclick="app.resetWater()">Zerar</button>
                             </div>
+                        </div>
+                    `;
+                },
+
+                espiritual() {
+                    const rosaryDayKey = DB.selectedRosaryDay;
+                    const rosary = rosaryData[rosaryDayKey];
+
+                    return `
+                        <div class="card">
+                            <label class="stat-lbl" style="display:block; margin-bottom:6px;">Selecione o Dia da Semana:</label>
+                            <select class="select-custom" onchange="app.setRosaryDay(this.value)">
+                                <option value="segunda" ${rosaryDayKey === 'segunda' ? 'selected' : ''}>Segunda-Feira — Mistérios Gozosos</option>
+                                <option value="terca" ${rosaryDayKey === 'terca' ? 'selected' : ''}>Terça-Feira — Mistérios Dolorosos</option>
+                                <option value="quarta" ${rosaryDayKey === 'quarta' ? 'selected' : ''}>Quarta-Feira — Mistérios Gloriosos</option>
+                                <option value="quinta" ${rosaryDayKey === 'quinta' ? 'selected' : ''}>Quinta-Feira — Mistérios Luminosos</option>
+                                <option value="sexta" ${rosaryDayKey === 'sexta' ? 'selected' : ''}>Sexta-Feira — Mistérios Dolorosos</option>
+                                <option value="sabado" ${rosaryDayKey === 'sabado' ? 'selected' : ''}>Sábado — Mistérios Gozosos</option>
+                                <option value="domingo" ${rosaryDayKey === 'domingo' ? 'selected' : ''}>Domingo — Mistérios Gloriosos</option>
+                            </select>
+
+                            <div class="card-header" style="margin-bottom:4px">
+                                <h3 class="card-title">✨ ${rosary.title}</h3>
+                            </div>
+                            <p style="font-size:0.85rem; margin-bottom:14px; color:var(--primary-pink-dark); font-weight:600;">Meditação Diária do Santo Terço</p>
+
+                            ${rosary.items.map(misterio => `
+                                <div class="check-item" style="cursor:default;">
+                                    <span class="check-txt" style="font-weight:500;">${misterio}</span>
+                                </div>
+                            `).join('')}
                         </div>
                     `;
                 },
