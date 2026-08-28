@@ -1,710 +1,868 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Geral de Custos Administrativos</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#FAF0F4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Planner V">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Planner diário</title>
+
+    <!-- Ícones dinâmicos em SVG (Fundo Rosa Claro com "V" Rosa) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='128' fill='%23FCE8F0'/><text x='50%20' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='280' fill='%23C97A9C'>V</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='128' fill='%23FCE8F0'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='280' fill='%23C97A9C'>V</text></svg>">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-main: #f0fdf4;
-            --card-bg: #ffffff;
-            --text-primary: #14532d;
-            --text-secondary: #374151;
-            --primary: #15803d;
-            --primary-light: #dcfce7;
-            --accent: #16a34a;
-            --border: #bbf7d0;
-            --hover-bg: #f0fdf4;
-            --table-header-bg: #e2fbe8;
-            --table-row-hover: #dcfce7;
+            --bg-main: #FAF0F4;
+            --bg-card: #FFFFFF;
+            --bg-secondary: #F7E4EC;
+            --primary-pink: #E8A0BF;
+            --primary-pink-light: #FCE8F0;
+            --primary-pink-dark: #C97A9C;
+            --blush-accent: #F4C2C2;
+            --water-blue: #93C5FD;
+            --water-blue-light: #EFF6FF;
+            --text-primary: #2D2727;
+            --text-secondary: #786F6F;
+            --text-muted: #A39B9B;
+            --border-color: #F0D5E1;
+            --border-radius-s: 12px;
+            --border-radius-m: 20px;
+            --border-radius-l: 28px;
+            --border-radius-full: 9999px;
+            --shadow-card: 0 4px 20px rgba(232, 160, 191, 0.12);
+            --shadow-floating: 0 12px 35px rgba(232, 160, 191, 0.3);
+            --font-primary: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        [data-theme="dark"] {
-            --bg-main: #052e16;
-            --card-bg: #0f3923;
-            --text-primary: #f0fdf4;
-            --text-secondary: #9ca3af;
-            --primary: #4ade80;
-            --primary-light: #14532d;
-            --accent: #22c55e;
-            --border: #166534;
-            --hover-bg: #14532d;
-            --table-header-bg: #14532d;
-            --table-row-hover: #166534;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+        body { background-color: var(--bg-main); color: var(--text-primary); font-family: var(--font-primary); min-height: 100vh; padding-bottom: calc(85px + env(safe-area-inset-bottom)); }
+        h1, h2, h3 { font-weight: 600; letter-spacing: -0.02em; }
+        p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: rgba(250, 240, 244, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--border-color); padding-top: calc(16px + env(safe-area-inset-top)); }
+        .greeting-subtitle { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary-pink-dark); font-weight: 700; }
+        .greeting-title { font-size: 1.25rem; color: var(--text-primary); }
+        .avatar-container { width: 42px; height: 42px; border-radius: var(--border-radius-full); background: linear-gradient(135deg, var(--primary-pink), var(--primary-pink-dark)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.1rem; box-shadow: var(--shadow-card); cursor: pointer; border: 2px solid #FFF; }
 
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-primary);
-            padding: 24px;
-            max-width: 1400px;
-            margin: 0 auto;
-            transition: background-color 0.3s, color 0.3s;
-        }
+        .viewport { padding: 12px 20px 30px; max-width: 600px; margin: 0 auto; }
+        .view-screen { animation: fadeInSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeInSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
+        .card { background: var(--bg-card); border-radius: var(--border-radius-m); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .card-title { font-size: 1.05rem; display: flex; align-items: center; gap: 8px; color: var(--text-primary); }
+        
+        .progress-ring-card { display: flex; align-items: center; gap: 20px; background: linear-gradient(135deg, #FFFFFF, #FDF0F5); }
+        .ring-container { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
+        .ring-container svg { transform: rotate(-90deg); }
+        .ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 700; font-size: 1rem; color: var(--primary-pink-dark); }
 
-        header h1 {
-            font-size: 24px;
-            color: var(--primary);
-            margin-bottom: 4px;
-        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .stat-box { background: var(--primary-pink-light); padding: 12px; border-radius: var(--border-radius-s); text-align: center; border: 1px solid var(--border-color); cursor: pointer; }
+        .stat-val { font-size: 1.15rem; font-weight: 700; color: var(--primary-pink-dark); }
+        .stat-lbl { font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; }
 
-        header p {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
+        /* Checklist Interativo com Suporte a Touch & Drag */
+        .check-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--bg-main); border-radius: var(--border-radius-s); margin-bottom: 8px; transition: transform 0.15s ease, background-color 0.2s ease; border: 1px solid transparent; gap: 10px; touch-action: none; }
+        .check-item.dragging { opacity: 0.6; transform: scale(1.02); border: 2px dashed var(--primary-pink); background: white; box-shadow: var(--shadow-floating); z-index: 10; }
+        .check-item.completed { background: var(--primary-pink-light); }
+        .check-item.completed .check-txt { text-decoration: line-through; color: var(--text-muted); }
+        .check-content { display: flex; align-items: center; gap: 12px; flex: 1; }
+        .checkbox { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--primary-pink); background: white; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0; cursor: pointer; }
+        .check-item.completed .checkbox { background: var(--primary-pink); color: white; }
+        .drag-handle { color: var(--primary-pink-dark); font-size: 1.2rem; padding: 4px 8px; cursor: grab; font-weight: bold; }
 
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .btn-primary { width: 100%; background: linear-gradient(135deg, var(--primary-pink), var(--primary-pink-dark)); color: white; border: none; padding: 14px; border-radius: var(--border-radius-m); font-weight: 600; font-size: 0.95rem; box-shadow: var(--shadow-floating); cursor: pointer; margin-top: 8px; }
+        .btn-primary:active { transform: scale(0.98); }
 
-        .theme-toggle-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            color: var(--text-primary);
-            padding: 8px 14px;
-            border-radius: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            font-size: 13px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            transition: all 0.2s;
-        }
+        .select-custom { width: 100%; padding: 12px; border-radius: var(--border-radius-s); border: 1px solid var(--border-color); background: white; font-family: inherit; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; outline: none; cursor: pointer; box-shadow: var(--shadow-card); }
 
-        .theme-toggle-btn:hover {
-            border-color: var(--primary);
-            background: var(--primary-light);
-        }
+        .calendar-bar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
+        .day-card { flex: 1; min-width: 44px; padding: 10px 0; text-align: center; background: white; border-radius: var(--border-radius-s); border: 1px solid var(--border-color); cursor: pointer; }
+        .day-card.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
+        .day-card.active .day-name { color: white; }
+        .day-name { font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); }
 
-        /* Month Selector Bar */
-        .month-selector-bar {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 8px 16px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
+        .water-bottle { height: 160px; width: 90px; border: 3px solid var(--water-blue); border-radius: 20px; margin: 15px auto; position: relative; overflow: hidden; background: #FFF; }
+        .water-fill { position: absolute; bottom: 0; width: 100%; background: linear-gradient(180deg, #A5F3FC, var(--water-blue)); transition: height 0.5s ease; }
 
-        .month-selector-bar label {
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        /* Navegação Ajustada para Mobile e Safe Area */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; padding-bottom: env(safe-area-inset-bottom); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 100; height: calc(65px + env(safe-area-inset-bottom)); }
+        .nav-item { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.62rem; font-weight: 600; cursor: pointer; flex: 1; padding-top: 6px; }
+        .nav-item svg { width: 19px; height: 19px; stroke: var(--text-muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .nav-item.active { color: var(--primary-pink-dark); }
+        .nav-item.active svg { stroke: var(--primary-pink-dark); }
 
-        .month-select {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg-main);
-            color: var(--text-primary);
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.2s;
-        }
+        .subtabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
+        .subtab-btn { background: white; border: 1px solid var(--border-color); padding: 8px 14px; border-radius: var(--border-radius-full); font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; cursor: pointer; }
+        .subtab-btn.active { background: var(--primary-pink-dark); color: white; border-color: var(--primary-pink-dark); }
 
-        .month-select:hover {
-            border-color: var(--primary);
-        }
-
-        /* KPI Cards Grid */
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .kpi-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .kpi-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 10px;
-            background: var(--primary-light);
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .kpi-info h3 {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-        }
-
-        .kpi-info p {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        /* Layout Grid */
-        .dash-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 24px;
-        }
-
-        @media (max-width: 1024px) {
-            .dash-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin-bottom: 24px;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Filter Pills */
-        .filter-container {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .filter-btn {
-            background: var(--bg-main);
-            border: 1px solid var(--border);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .filter-btn:hover {
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .filter-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        /* Interactive Drilldown Table */
-        .drill-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        .drill-table th {
-            background: var(--table-header-bg);
-            text-align: left;
-            padding: 10px 12px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 12px;
-            text-transform: uppercase;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .drill-table tr.row-group {
-            background-color: var(--table-header-bg);
-            font-weight: 600;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .drill-table tr.row-group:hover {
-            background-color: var(--table-row-hover);
-        }
-
-        .drill-table tr.row-cat {
-            background-color: var(--card-bg);
-            font-weight: 500;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border);
-            display: none;
-        }
-
-        .drill-table tr.row-cat:hover {
-            background-color: var(--hover-bg);
-        }
-
-        .drill-table tr.row-desc {
-            background-color: var(--card-bg);
-            font-size: 13px;
-            border-bottom: 1px solid var(--border);
-            display: none;
-        }
-
-        .drill-table td {
-            padding: 10px 12px;
-        }
-
-        .indent-1 {
-            padding-left: 28px !important;
-        }
-
-        .indent-2 {
-            padding-left: 48px !important;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .toggle-icon {
-            display: inline-block;
-            width: 16px;
-            transition: transform 0.2s;
-        }
-
-        .expanded > td > .toggle-icon {
-            transform: rotate(90deg);
-        }
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: white; padding: 10px 20px; border-radius: var(--border-radius-full); font-size: 0.85rem; z-index: 200; display: none; box-shadow: var(--shadow-floating); }
     </style>
 </head>
 <body>
 
-    <header>
+    <header class="top-bar">
         <div>
-            <h1>Dashboard Interativo de Custos Administrativos</h1>
-            <p>Visão Executiva com navegação detalhada por Mês e Hierarquia de Gastos</p>
+            <span class="greeting-subtitle">Planner diário</span>
+            <h1 class="greeting-title" id="current-date-title">Segunda-Feira</h1>
         </div>
-        <div class="header-actions">
-            <button class="theme-toggle-btn" onclick="toggleTheme()">
-                <i data-lucide="moon" id="theme-icon"></i> <span id="theme-text">Modo Escuro</span>
-            </button>
-            <div class="month-selector-bar">
-                <label for="monthSelect"><i data-lucide="calendar"></i> Período / Mês:</label>
-                <select id="monthSelect" class="month-select" onchange="onMonthChange()">
-                    <option value="ALL" selected>Visão Geral (Todos os Meses)</option>
-                    <option value="01/2026">Janeiro / 2026</option>
-                    <option value="02/2026">Fevereiro / 2026</option>
-                    <option value="03/2026">Março / 2026</option>
-                    <option value="04/2026">Abril / 2026</option>
-                    <option value="05/2026">Maio / 2026</option>
-                    <option value="06/2026">Junho / 2026</option>
-                    <option value="07/2026">Julho / 2026</option>
-                    <option value="08/2026">Agosto / 2026</option>
-                </select>
-            </div>
-        </div>
+        <div class="avatar-container" onclick="app.nav('perfil')">V</div>
     </header>
 
-    <div class="kpi-grid">
-        <div class="kpi-card">
-            <div class="kpi-icon"><i data-lucide="dollar-sign"></i></div>
-            <div class="kpi-info">
-                <h3>Custo Total</h3>
-                <p id="kpi-total">R$ 0,00</p>
-            </div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-icon"><i data-lucide="file-text"></i></div>
-            <div class="kpi-info">
-                <h3>Lançamentos</h3>
-                <p id="kpi-count">0 itens</p>
-            </div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-icon"><i data-lucide="pie-chart"></i></div>
-            <div class="kpi-info">
-                <h3>Maior Centro de Custo</h3>
-                <p id="kpi-top">-</p>
-            </div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-icon"><i data-lucide="trending-up"></i></div>
-            <div class="kpi-info">
-                <h3>Ticket Médio / Item</h3>
-                <p id="kpi-avg">R$ 0,00</p>
-            </div>
-        </div>
-    </div>
+    <main id="app-viewport" class="viewport"></main>
+    <div id="toast" class="toast"></div>
 
-    <div class="dash-grid">
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title"><i data-lucide="pie-chart"></i> Distribuição Por Centros de Custos</div>
-            </div>
-            <div style="position: relative; height: 320px; width: 100%;">
-                <canvas id="costChart"></canvas>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title"><i data-lucide="list-tree"></i> Detalhamento Interativo (Grupo > Categoria)</div>
-                <span class="badge">Clique em um grupo para expandir</span>
-            </div>
-            <div style="max-height: 320px; overflow-y: auto;">
-                <table class="drill-table">
-                    <thead>
-                        <tr>
-                            <th>Estrutura / Custo</th>
-                            <th class="text-right">% Part.</th>
-                            <th class="text-right">Valor (R$)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="drillBody">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-header">
-            <div class="card-title"><i data-lucide="table"></i> Tabela Completa de Despesas</div>
-            <div class="filter-container" id="group-filter-pills">
-                <button class="filter-btn active" onclick="filterTableGroup('ALL', this)">Todos os Grupos</button>
-                <button class="filter-btn" onclick="filterTableGroup('CORPORATIVO', this)">Corporativo</button>
-                <button class="filter-btn" onclick="filterTableGroup('PREDIAL', this)">Predial</button>
-                <button class="filter-btn" onclick="filterTableGroup('TI', this)">TI</button>
-                <button class="filter-btn" onclick="filterTableGroup('COMERCIAL', this)">Comercial</button>
-                <button class="filter-btn" onclick="filterTableGroup('FROTA', this)">Frota</button>
-                <button class="filter-btn" onclick="filterTableGroup('BENS MATERIAIS', this)">Bens Materiais</button>
-            </div>
-        </div>
-        <div style="overflow-x: auto; max-height: 450px;">
-            <table class="drill-table">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Grupo</th>
-                        <th>Categoria</th>
-                        <th>Subcategoria</th>
-                        <th>Descrição do Custo</th>
-                        <th>Fornecedor</th>
-                        <th>Frequência</th>
-                        <th class="text-right">Valor (R$)</th>
-                    </tr>
-                </thead>
-                <tbody id="fullTableBody">
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="app.nav('dashboard')">
+            <svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Início</span>
+        </button>
+        <button class="nav-item" onclick="app.nav('alimentacao')">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span>Nutrição</span>
+        </button>
+        <button class="nav-item" onclick="app.nav('treinos')">
+            <svg viewBox="0 0 24 24"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/></svg>
+            <span>Treinos</span>
+        </button>
+        <button class="nav-item" onclick="app.nav('agua')">
+            <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            <span>Água</span>
+        </button>
+        <button class="nav-item" onclick="app.nav('espiritual')">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Espiritual</span>
+        </button>
+        <button class="nav-item" onclick="app.nav('financeiro')">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span>Finanças</span>
+        </button>
+        <button class="nav-item" onclick="app.nav('perfil')">
+            <svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Perfil</span>
+        </button>
+    </nav>
 
     <script>
-        const allData = [
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PAPEL INTERFOLHA | CONSUMO MENSAL", "forn": "GIMBA", "val": 288.2, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PRATO DESCARTAVEL | CONSUMO MENSAL", "forn": "GIMBA", "val": 18.18, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "GARFO DESCARTAVEL | CONSUMO MENSAL", "forn": "GIMBA", "val": 10.53, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "GUARDANAPO | CONSUMO MENSAL", "forn": "GIMBA", "val": 10.79, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAFÉ EM PÓ | CONSUMO MENSAL", "forn": "GIMBA", "val": 64.81, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "COCA-COLA 2 LITROS | CONSUMO MENSAL", "forn": "GIMBA", "val": 43.53, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "FILTRO DE CAFÉ - 103 | CONSUMO MENSAL", "forn": "GIMBA", "val": 3.62, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "DETERGENTE - 5 LITROS | CONSUMO MENSAL", "forn": "GIMBA", "val": 24.81, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PAPEL HIGIENICO | CONSUMO MENSAL", "forn": "GIMBA", "val": 77.82, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "ESPONJA MULTIUSO | CONSUMO MENSAL", "forn": "GIMBA", "val": 9.73, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "BOM AR | CONSUMO MENSAL", "forn": "GIMBA", "val": 28.81, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "LENÇO UMEDECIDO | CONSUMO MENSAL", "forn": "GIMBA", "val": 70.79, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "MATERIAL DE ESCRITORIO", "desc": "FOLHA SULFITE", "forn": "GIMBA", "val": 97.53, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAFÉ EM GRÃOS", "forn": "MERCADOLIVRE", "val": 329.97, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "CAPACETE PARA PROTEÇÃO", "forn": "MERCADOLIVRE", "val": 160.0, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "LUVA X11 MASCULINA BLACKOU 2", "forn": "MERCADOLIVRE", "val": 67.8, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "COLETE PARA PROTEÇÃO", "forn": "MERCADOLIVRE", "val": 246.05, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "AROMATIZADOR DE AMBIENTE", "forn": "MERCADOLIVRE", "val": 217.79, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "MATERIAL DE ESCRITORIO", "desc": "CARREGADOR DURACELL - 4 PILHAS", "forn": "MERCADOLIVRE", "val": 217.79, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SABONETE LIQUIDO | CONSUMO MENSAL", "forn": "GIMBA", "val": 33.9, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PAPEL HIGIENICO | CONSUMO MENSAL", "forn": "GIMBA", "val": 78.99, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAFÉ EM PÓ | CONSUMO MENSAL", "forn": "GIMBA", "val": 32.99, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "FILTRO DE CAFÉ | CONSUMO MENSAL", "forn": "GIMBA", "val": 15.50, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "15/01/2026", "grupo": "PREDIAL", "cat": "MANUTENÇÃO PREDIAL", "subcat": "SERVIÇOS TERCEIROS", "desc": "MANUTENÇÃO AR CONDICIONADO", "forn": "REFRIGERACAO SILVA", "val": 1250.00, "freq": "PONTUAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "20/01/2026", "grupo": "TI", "cat": "SOFTWARE E LICENÇAS", "subcat": "SaaS", "desc": "ASSINATURA MICROSOFT 365", "forn": "MICROSOFT", "val": 890.00, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"},
-            {"data": "05/02/2026", "grupo": "COMERCIAL", "cat": "MARKETING", "subcat": "ANÚNCIOS", "desc": "CAMPANHA GOOGLE ADS", "forn": "GOOGLE", "val": 2500.00, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"},
-            {"data": "10/02/2026", "grupo": "FROTA", "cat": "COMBUSTÍVEL", "subcat": "GASTOS GERAIS", "desc": "ABASTECIMENTO VEÍCULOS", "forn": "POSTO IPIRANGA", "val": 1420.50, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"},
-            {"data": "18/02/2026", "grupo": "BENS MATERIAIS", "cat": "EQUIPAMENTOS", "subcat": "INFORMÁTICA", "desc": "NOTEBOOK CORE I7", "forn": "DELL", "val": 4800.00, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}
+        const DB = {
+            user: { name: 'Vanessa', age: 27, height: '1.52m', weight: 60, targetWeight: 50 },
+            water: { current: 750, target: 3000 },
+            selectedDayKey: 'segunda',
+            selectedNutriTab: 'pretreino',
+            selectedWorkoutDay: 'segunda',
+            selectedFinanceMonth: 'jan',
+            selectedRosaryDay: 'segunda',
+            workoutProgress: {},
+            checklistState: {},
+            customTasksOrder: {},
+            financeState: {}
+        };
+
+        const weekDaysList = [
+            { key: 'segunda', label: 'Seg' },
+            { key: 'terca', label: 'Ter' },
+            { key: 'quarta', label: 'Qua' },
+            { key: 'quinta', label: 'Qui' },
+            { key: 'sexta', label: 'Sex' },
+            { key: 'sabado', label: 'Sab' },
+            { key: 'domingo', label: 'Dom' }
         ];
 
-        let myChart = null;
-        let selectedGroupFilter = 'ALL';
+        const dayFullNames = {
+            segunda: 'Segunda-Feira',
+            terca: 'Terça-Feira',
+            quarta: 'Quarta-Feira',
+            quinta: 'Quinta-Feira',
+            sexta: 'Sexta-Feira',
+            sabado: 'Sábado',
+            domingo: 'Domingo'
+        };
 
-        function formatCurrency(val) {
-            return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        }
-
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-            
-            if (newTheme === 'dark') {
-                themeIcon.setAttribute('data-lucide', 'sun');
-                themeText.textContent = 'Modo Claro';
-            } else {
-                themeIcon.setAttribute('data-lucide', 'moon');
-                themeText.textContent = 'Modo Escuro';
+        const rosaryData = {
+            segunda: {
+                title: "Mistérios Gozosos",
+                items: [
+                    "1. A Anunciação do Anjo Gabriel a Maria.",
+                    "2. A Visitação de Maria a Santa Isabel.",
+                    "3. O Nascimento de Jesus em Belém.",
+                    "4. A Apresentação do Menino Jesus no Templo.",
+                    "5. O Encontro do Menino Jesus entre os Doutores da Lei."
+                ]
+            },
+            terca: {
+                title: "Mistérios Dolorosos",
+                items: [
+                    "1. A Agonia de Jesus no Horto das Oliveiras.",
+                    "2. A Flagelação de Jesus.",
+                    "3. A Coroação de Espinhos.",
+                    "4. Jesus carrega a Cruz até o Calvário.",
+                    "5. A Crucificação e Morte de Jesus."
+                ]
+            },
+            quarta: {
+                title: "Mistérios Gloriosos",
+                items: [
+                    "1. A Ressurreição de Jesus.",
+                    "2. A Ascensão de Jesus ao Céu.",
+                    "3. A Vinda do Espírito Santo em Pentecostes.",
+                    "4. A Assunção de Maria ao Céu.",
+                    "5. A Coroação de Maria como Rainha do Céu e da Terra."
+                ]
+            },
+            quinta: {
+                title: "Mistérios Luminosos",
+                items: [
+                    "1. O Batismo de Jesus no Rio Jordão.",
+                    "2. A Auto-revelação de Jesus nas Bodas de Caná.",
+                    "3. O Anúncio do Reino de Deus e o Convite à Conversão.",
+                    "4. A Transfiguração de Jesus no Monte Tabor.",
+                    "5. A Instituição da Eucaristia na Última Ceia."
+                ]
+            },
+            sexta: {
+                title: "Mistérios Dolorosos",
+                items: [
+                    "1. A Agonia de Jesus no Horto das Oliveiras.",
+                    "2. A Flagelação de Jesus.",
+                    "3. A Coroação de Espinhos.",
+                    "4. Jesus carrega a Cruz até o Calvário.",
+                    "5. A Crucificação e Morte de Jesus."
+                ]
+            },
+            sabado: {
+                title: "Mistérios Gozosos",
+                items: [
+                    "1. A Anunciação do Anjo Gabriel a Maria.",
+                    "2. A Visitação de Maria a Santa Isabel.",
+                    "3. O Nascimento de Jesus em Belém.",
+                    "4. A Apresentação do Menino Jesus no Templo.",
+                    "5. O Encontro do Menino Jesus entre os Doutores da Lei."
+                ]
+            },
+            domingo: {
+                title: "Mistérios Gloriosos",
+                items: [
+                    "1. A Ressurreição de Jesus.",
+                    "2. A Ascensão de Jesus ao Céu.",
+                    "3. A Vinda do Espírito Santo em Pentecostes.",
+                    "4. A Assunção de Maria ao Céu.",
+                    "5. A Coroação de Maria como Rainha do Céu e da Terra."
+                ]
             }
-            lucide.createIcons();
-            updateDashboard();
-        }
+        };
 
-        function onMonthChange() {
-            updateDashboard();
-        }
+        const financeMonthsList = [
+            { key: 'jan', label: 'Jan' }, { key: 'fev', label: 'Fev' }, { key: 'mar', label: 'Mar' },
+            { key: 'abr', label: 'Abr' }, { key: 'mai', label: 'Mai' }, { key: 'jun', label: 'Jun' },
+            { key: 'jul', label: 'Jul' }, { key: 'ago', label: 'Ago' }, { key: 'set', label: 'Set' },
+            { key: 'out', label: 'Out' }, { key: 'nov', label: 'Nov' }, { key: 'dez', label: 'Dez' }
+        ];
 
-        function filterTableGroup(group, btn) {
-            selectedGroupFilter = group;
-            document.querySelectorAll('#group-filter-pills .filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderFullTable();
-        }
+        const financeItems = ['Aluguel', 'Enel', 'Tim', 'Vivo', 'Comgás', 'Flávia', 'Nubank', 'Itaú'];
 
-        function getFilteredData() {
-            const selectedMonth = document.getElementById('monthSelect').value;
-            if (selectedMonth === 'ALL') {
-                return allData;
-            }
-            return allData.filter(d => d.mes_ano === selectedMonth);
-        }
+        const defaultTasksMap = {
+            segunda: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Gozosos)' },
+                { id: 'water', text: 'Meta de Água (3000ml)' },
+                { id: 'pre', text: 'Refeição: Pré-treino' },
+                { id: 'workout', text: 'Treino: Glúteo Máximo & Posterior' },
+                { id: 'cafe', text: 'Refeição: Café da Manhã' },
+                { id: 'almoco', text: 'Refeição: Almoço' },
+                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
+                { id: 'jantar', text: 'Refeição: Jantar' }
+            ],
+            terca: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Dolorosos)' },
+                { id: 'water', text: 'Meta de Água (3000ml)' },
+                { id: 'pre', text: 'Refeição: Pré-treino' },
+                { id: 'workout', text: 'Treino: Costas • Bíceps • Ombros' },
+                { id: 'cafe', text: 'Refeição: Café da Manhã' },
+                { id: 'almoco', text: 'Refeição: Almoço' },
+                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
+                { id: 'jantar', text: 'Refeição: Jantar' }
+            ],
+            quarta: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Gloriosos)' },
+                { id: 'water', text: 'Meta de Água (3000ml)' },
+                { id: 'pre', text: 'Refeição: Pré-treino' },
+                { id: 'workout', text: 'Treino: Quadríceps & Glúteo Médio' },
+                { id: 'cafe', text: 'Refeição: Café da Manhã' },
+                { id: 'almoco', text: 'Refeição: Almoço' },
+                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
+                { id: 'jantar', text: 'Refeição: Jantar' }
+            ],
+            quinta: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Luminosos)' },
+                { id: 'water', text: 'Meta de Água (3000ml)' },
+                { id: 'pre', text: 'Refeição: Pré-treino' },
+                { id: 'workout', text: 'Treino: Costas • Braços • Core' },
+                { id: 'cafe', text: 'Refeição: Café da Manhã' },
+                { id: 'almoco', text: 'Refeição: Almoço' },
+                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
+                { id: 'jantar', text: 'Refeição: Jantar' }
+            ],
+            sexta: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Dolorosos)' },
+                { id: 'water', text: 'Meta de Água (3000ml)' },
+                { id: 'pre', text: 'Refeição: Pré-treino' },
+                { id: 'workout', text: 'Descanso Ativo & Mobilidade' },
+                { id: 'cafe', text: 'Refeição: Café da Manhã' },
+                { id: 'almoco', text: 'Refeição: Almoço' },
+                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
+                { id: 'jantar', text: 'Refeição: Jantar' }
+            ],
+            sabado: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Gozosos)' },
+                { id: 'water', text: 'Meta de Água (3000ml)' },
+                { id: 'pre', text: 'Refeição: Pré-treino' },
+                { id: 'workout', text: 'Treino: Glúteo Pump' },
+                { id: 'cafe', text: 'Refeição: Café da Manhã' },
+                { id: 'almoco', text: 'Refeição: Almoço' },
+                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
+                { id: 'jantar', text: 'Refeição: Jantar' }
+            ],
+            domingo: [
+                { id: 'terco', text: 'Rezar o Terço (Mistérios Gloriosos)' },
+                { id: 'water', text: 'Meta de Água (3000ml)' },
+                { id: 'pre', text: 'Refeição: Pré-treino' },
+                { id: 'workout', text: 'Descanso Total & Recuperação' },
+                { id: 'cafe', text: 'Refeição: Café da Manhã' },
+                { id: 'almoco', text: 'Refeição: Almoço' },
+                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
+                { id: 'jantar', text: 'Refeição: Jantar' }
+            ]
+        };
 
-        function updateDashboard() {
-            const data = getFilteredData();
-            
-            // KPIs
-            const total = data.reduce((acc, item) => acc + item.val, 0);
-            const count = data.length;
-            const avg = count > 0 ? total / count : 0;
-            
-            // Group Totals
-            const groupTotals = {};
-            data.forEach(d => {
-                groupTotals[d.grupo] = (groupTotals[d.grupo] || 0) + d.val;
-            });
+        const workoutsData = {
+            segunda: { title: "Glúteo Máximo & Posterior", desc: "Foco em Força e Carga • 55–65 min", items: ["Elevação Pélvica (Barra/Máq) - 4x8–12 (2s topo)", "Agachamento Búlgaro - 3x10–12", "Bom Dia / Good Morning - 4x10–12", "Cadeira Flexora - 4x12–15", "Glúteo Caneleira/Polia - 3x12–15"] },
+            terca: { title: "Costas • Bíceps • Ombros", desc: "Definição do Tronco + Cardio", items: ["Puxada Alta Aberta - 4x10–12", "Remada Baixa Triângulo - 3x12", "Desenvolvimento Halteres - 3x12", "Elevação Lateral - 4x12–15", "Rosca Bíceps - 4x12–15", "Cardio: 25–30 min"] },
+            quarta: { title: "Quadríceps & Glúteo Médio", desc: "Foco em Pernas e Lateral do Glúteo", items: ["Agachamento Halter (Goblet) - 4x10–12", "Leg Press 45° - 3x10–12", "Cadeira Extensora - 3x12–15", "Cadeira Abdutora - 4x15–20", "Abdução no Cabo - 3x12–15", "Cardio Bike: 25–30 min"] },
+            quinta: { title: "Costas • Braços • Core", desc: "Escultura de Tronco e Abdômen", items: ["Puxada Triângulo - 4x10–12", "Remada Unilateral (Serrote) - 3x12", "Face Pull com Corda - 3x15", "Tríceps Pulley + Rosca Direta - 3x12", "Prancha Abdominal - 3x45–60s", "Abdominal Infra - 3x15–20", "Cardio: 25–30 min"] },
+            sexta: { title: "Descanso Ativo & Recuperação", desc: "Recuperação Muscular Direcionada", items: ["Alongamentos Leves", "Mobilidade de Quadril", "Hidratação Adicional", "Sono reparador"] },
+            sabado: { title: "Glúteo Pump & Posterior", desc: "Modelagem e Exaustão Muscular", items: ["Elevação Pélvica Unilateral - 3x12", "Levantamento Terra Sumô - 4x10", "Passada Caminhando - 3x20 passos", "Cadeira Flexora - 3x12–15", "Cadeira Abdutora - 3x20 (Dropset)"] },
+            domingo: { title: "Descanso Total & Planejamento", desc: "Preparação para a Próxima Semana", items: ["Resumo semanal de conquistas", "Organização do Meal Prep / Marmitas", "Relaxamento e Descanso"] }
+        };
 
-            let topGroup = '-';
-            let maxVal = 0;
-            Object.keys(groupTotals).forEach(g => {
-                if (groupTotals[g] > maxVal) {
-                    maxVal = groupTotals[g];
-                    topGroup = g;
-                }
-            });
+        let draggedIndex = null;
 
-            document.getElementById('kpi-total').textContent = formatCurrency(total);
-            document.getElementById('kpi-count').textContent = `${count} itens`;
-            document.getElementById('kpi-top').textContent = topGroup;
-            document.getElementById('kpi-avg').textContent = formatCurrency(avg);
+        const app = {
+            init() {
+                this.loadDB();
+                this.updateDateHeader();
+                this.nav('dashboard');
+            },
 
-            renderChart(groupTotals);
-            renderDrilldownTable(data, total);
-            renderFullTable();
-        }
+            loadDB() {
+                const saved = localStorage.getItem('van_fitness_db');
+                if (saved) Object.assign(DB, JSON.parse(saved));
+                DB.water.target = 3000;
+            },
 
-        function renderChart(groupTotals) {
-            const ctx = document.getElementById('costChart').getContext('2d');
-            const labels = Object.keys(groupTotals);
-            const values = Object.values(groupTotals);
+            saveDB() {
+                localStorage.setItem('van_fitness_db', JSON.stringify(DB));
+            },
 
-            const greenPalette = [
-                '#16a34a', '#22c55e', '#4ade80', '#86efac', 
-                '#15803d', '#166534', '#14532d', '#052e16'
-            ];
+            toast(msg) {
+                const t = document.getElementById('toast');
+                t.innerText = msg;
+                t.style.display = 'block';
+                setTimeout(() => t.style.display = 'none', 2200);
+            },
 
-            if (myChart) {
-                myChart.destroy();
-            }
+            updateDateHeader() {
+                document.getElementById('current-date-title').innerText = dayFullNames[DB.selectedDayKey];
+            },
 
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const textColor = isDark ? '#f0fdf4' : '#14532d';
+            nav(screen) {
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                const btnMap = { dashboard: 0, alimentacao: 1, treinos: 2, agua: 3, espiritual: 4, financeiro: 5, perfil: 6 };
+                if (btnMap[screen] !== undefined) document.querySelectorAll('.nav-item')[btnMap[screen]].classList.add('active');
 
-            myChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: greenPalette.slice(0, labels.length),
-                        borderWidth: 2,
-                        borderColor: isDark ? '#0f3923' : '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                color: textColor,
-                                font: { size: 12, weight: '600' }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.label}: ${formatCurrency(context.raw)}`;
-                                }
+                const vp = document.getElementById('app-viewport');
+                vp.innerHTML = `<div class="view-screen">${this.screens[screen]()}</div>`;
+            },
+
+            selectWeekDay(dayKey) {
+                DB.selectedDayKey = dayKey;
+                this.saveDB();
+                this.updateDateHeader();
+                this.nav('dashboard');
+            },
+
+            toggleDailyTask(taskId) {
+                const key = `day_${DB.selectedDayKey}_${taskId}`;
+                DB.checklistState[key] = !DB.checklistState[key];
+                this.saveDB();
+                this.nav('dashboard');
+            },
+
+            initTouchReorder() {
+                const container = document.getElementById('checklist-container');
+                if (!container) return;
+
+                let activeItem = null;
+
+                const items = container.querySelectorAll('.check-item');
+                items.forEach((item, index) => {
+                    item.addEventListener('touchstart', (e) => {
+                        activeItem = item;
+                        draggedIndex = index;
+                        item.classList.add('dragging');
+                    }, { passive: true });
+
+                    item.addEventListener('touchmove', (e) => {
+                        if (!activeItem) return;
+                        const currentY = e.touches[0].clientY;
+                        const targetElement = document.elementFromPoint(e.touches[0].clientX, currentY);
+                        const targetItem = targetElement ? targetElement.closest('.check-item') : null;
+
+                        if (targetItem && targetItem !== activeItem) {
+                            const targetIndex = parseInt(targetItem.getAttribute('data-index'));
+                            if (!isNaN(targetIndex) && targetIndex !== draggedIndex) {
+                                const tasks = app.getDailyTasks(DB.selectedDayKey);
+                                const draggedTask = tasks[draggedIndex];
+                                tasks.splice(draggedIndex, 1);
+                                tasks.splice(targetIndex, 0, draggedTask);
+                                DB.customTasksOrder[DB.selectedDayKey] = tasks;
+                                app.saveDB();
+                                draggedIndex = targetIndex;
+                                app.nav('dashboard');
                             }
                         }
-                    }
-                }
-            });
-        }
+                    }, { passive: true });
 
-        function renderDrilldownTable(data, totalSum) {
-            const tbody = document.getElementById('drillBody');
-            tbody.innerHTML = '';
-
-            const hierarchy = {};
-            data.forEach(d => {
-                if (!hierarchy[d.grupo]) hierarchy[d.grupo] = { total: 0, cats: {} };
-                hierarchy[d.grupo].total += d.val;
-
-                if (!hierarchy[d.grupo].cats[d.cat]) hierarchy[d.grupo].cats[d.cat] = 0;
-                hierarchy[d.grupo].cats[d.cat] += d.val;
-            });
-
-            let groupIdx = 0;
-            Object.keys(hierarchy).forEach(group => {
-                groupIdx++;
-                const gData = hierarchy[group];
-                const gPct = totalSum > 0 ? ((gData.total / totalSum) * 100).toFixed(1) : 0;
-
-                const trGroup = document.createElement('tr');
-                trGroup.className = 'row-group';
-                trGroup.onclick = () => toggleRow(`cat-group-${groupIdx}`, trGroup);
-                trGroup.innerHTML = `
-                    <td><span class="toggle-icon">▶</span> <strong>${group}</strong></td>
-                    <td class="text-right">${gPct}%</td>
-                    <td class="text-right"><strong>${formatCurrency(gData.total)}</strong></td>
-                `;
-                tbody.appendChild(trGroup);
-
-                Object.keys(gData.cats).forEach(cat => {
-                    const cVal = gData.cats[cat];
-                    const cPct = totalSum > 0 ? ((cVal / totalSum) * 100).toFixed(1) : 0;
-
-                    const trCat = document.createElement('tr');
-                    trCat.className = `row-cat cat-group-${groupIdx}`;
-                    trCat.innerHTML = `
-                        <td class="indent-1">• ${cat}</td>
-                        <td class="text-right">${cPct}%</td>
-                        <td class="text-right">${formatCurrency(cVal)}</td>
-                    `;
-                    tbody.appendChild(trCat);
+                    item.addEventListener('touchend', () => {
+                        if (activeItem) {
+                            activeItem.classList.remove('dragging');
+                            activeItem = null;
+                            draggedIndex = null;
+                        }
+                    });
                 });
-            });
-        }
+            },
 
-        function toggleRow(className, parentTr) {
-            parentTr.classList.toggle('expanded');
-            const rows = document.getElementsByClassName(className);
-            for (let row of rows) {
-                row.style.display = row.style.display === 'table-row' ? 'none' : 'table-row';
+            handleDragStart(e, index) {
+                draggedIndex = index;
+                e.currentTarget.classList.add('dragging');
+            },
+
+            handleDragOver(e) {
+                e.preventDefault();
+            },
+
+            handleDrop(e, targetIndex) {
+                e.preventDefault();
+                if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+                const tasks = this.getDailyTasks(DB.selectedDayKey);
+                const draggedItem = tasks[draggedIndex];
+                
+                tasks.splice(draggedIndex, 1);
+                tasks.splice(targetIndex, 0, draggedItem);
+
+                DB.customTasksOrder[DB.selectedDayKey] = tasks;
+                this.saveDB();
+                draggedIndex = null;
+                this.nav('dashboard');
+            },
+
+            handleDragEnd(e) {
+                e.currentTarget.classList.remove('dragging');
+                draggedIndex = null;
+            },
+
+            toggleExercise(dayKey, index) {
+                const key = `${dayKey}_ex_${index}`;
+                DB.workoutProgress[key] = !DB.workoutProgress[key];
+                this.saveDB();
+                this.nav('treinos');
+            },
+
+            addWater(amount) {
+                DB.water.current = Math.max(0, Math.min(DB.water.target, DB.water.current + amount));
+                this.saveDB();
+                this.toast(amount >= 0 ? `+${amount}ml registrados! 💧` : `${amount}ml ajustados! 💧`);
+                this.nav('agua');
+            },
+
+            resetWater() {
+                DB.water.current = 0;
+                this.saveDB();
+                this.toast('Registro de água zerado! 💧');
+                this.nav('agua');
+            },
+
+            setNutriTab(tab) {
+                DB.selectedNutriTab = tab;
+                this.nav('alimentacao');
+            },
+
+            setWorkoutDay(day) {
+                DB.selectedWorkoutDay = day;
+                this.nav('treinos');
+            },
+
+            setFinanceMonth(monthKey) {
+                DB.selectedFinanceMonth = monthKey;
+                this.saveDB();
+                this.nav('financeiro');
+            },
+
+            setRosaryDay(dayKey) {
+                DB.selectedRosaryDay = dayKey;
+                this.saveDB();
+                this.nav('espiritual');
+            },
+
+            toggleFinanceItem(item) {
+                const key = `fin_${DB.selectedFinanceMonth}_${item}`;
+                DB.financeState[key] = !DB.financeState[key];
+                this.saveDB();
+                this.nav('financeiro');
+            },
+
+            getDailyTasks(dayKey) {
+                if (DB.customTasksOrder[dayKey] && DB.customTasksOrder[dayKey].length > 0) {
+                    return DB.customTasksOrder[dayKey];
+                }
+                return [...defaultTasksMap[dayKey]];
+            },
+
+            screens: {
+                dashboard() {
+                    const tasks = app.getDailyTasks(DB.selectedDayKey);
+                    let completed = 0;
+                    tasks.forEach(t => {
+                        const key = `day_${DB.selectedDayKey}_${t.id}`;
+                        if (DB.checklistState[key]) completed++;
+                    });
+                    const pct = Math.round((completed / tasks.length) * 100);
+
+                    const calHTML = weekDaysList.map(item => {
+                        const isActive = item.key === DB.selectedDayKey ? 'active' : '';
+                        return `
+                            <div class="day-card ${isActive}" onclick="app.selectWeekDay('${item.key}')">
+                                <div class="day-name">${item.label}</div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    setTimeout(() => app.initTouchReorder(), 100);
+
+                    return `
+                        <div class="calendar-bar">
+                            ${calHTML}
+                        </div>
+
+                        <div class="card progress-ring-card">
+                            <div class="ring-container">
+                                <svg width="80" height="80">
+                                    <circle cx="40" cy="40" r="32" stroke="#F0D5E1" stroke-width="8" fill="none"/>
+                                    <circle cx="40" cy="40" r="32" stroke="#C97A9C" stroke-width="8" fill="none" stroke-dasharray="201" stroke-dashoffset="${201 - (201 * pct) / 100}" stroke-linecap="round"/>
+                                </svg>
+                                <div class="ring-text">${pct}%</div>
+                            </div>
+                            <div>
+                                <h3>Progresso do Dia</h3>
+                                <p style="font-size:0.85rem">${completed} de ${tasks.length} tarefas concluídas (${dayFullNames[DB.selectedDayKey]}).</p>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Checklist Diário</h3>
+                                <span style="font-size:0.75rem; color:var(--text-muted);">Toque e arraste para reordenar</span>
+                            </div>
+                            <div id="checklist-container">
+                                ${tasks.map((t, idx) => {
+                                    const key = `day_${DB.selectedDayKey}_${t.id}`;
+                                    const isDone = !!DB.checklistState[key];
+                                    return `
+                                        <div class="check-item ${isDone ? 'completed' : ''}"
+                                             data-index="${idx}"
+                                             draggable="true"
+                                             ondragstart="app.handleDragStart(event, ${idx})"
+                                             ondragover="app.handleDragOver(event)"
+                                             ondrop="app.handleDrop(event, ${idx})"
+                                             ondragend="app.handleDragEnd(event)">
+                                            <div class="check-content">
+                                                <div class="checkbox" onclick="event.stopPropagation(); app.toggleDailyTask('${t.id}')">${isDone ? '✓' : ''}</div>
+                                                <span class="check-txt" onclick="app.toggleDailyTask('${t.id}')">${t.text}</span>
+                                            </div>
+                                            <div class="drag-handle">☰</div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="card stat-box" onclick="app.nav('agua')">
+                                <div class="stat-lbl">Hidratação</div>
+                                <div class="stat-val">${DB.water.current} / ${DB.water.target} ml</div>
+                            </div>
+                            <div class="card stat-box" onclick="app.nav('perfil')">
+                                <div class="stat-lbl">Meta do Projeto</div>
+                                <div class="stat-val">${DB.user.weight}kg ➔ ${DB.user.targetWeight}kg</div>
+                            </div>
+                        </div>
+                    `;
+                },
+
+                alimentacao() {
+                    const tab = DB.selectedNutriTab;
+                    return `
+                        <div class="subtabs">
+                            <button class="subtab-btn ${tab === 'pretreino' ? 'active' : ''}" onclick="app.setNutriTab('pretreino')">Pré-Treino</button>
+                            <button class="subtab-btn ${tab === 'cafe' ? 'active' : ''}" onclick="app.setNutriTab('cafe')">Café</button>
+                            <button class="subtab-btn ${tab === 'almoco' ? 'active' : ''}" onclick="app.setNutriTab('almoco')">Almoço</button>
+                            <button class="subtab-btn ${tab === 'lanche' ? 'active' : ''}" onclick="app.setNutriTab('lanche')">Lanche</button>
+                            <button class="subtab-btn ${tab === 'sobremesa' ? 'active' : ''}" onclick="app.setNutriTab('sobremesa')">Sobremesas</button>
+                            <button class="subtab-btn ${tab === 'jantar' ? 'active' : ''}" onclick="app.setNutriTab('jantar')">Jantar</button>
+                        </div>
+
+                        ${tab === 'pretreino' ? `
+                            <div class="card">
+                                <div class="card-header"><h3 class="card-title">🍌 Pré-Treino</h3></div>
+                                <p><strong>Opções fáceis para energia rápida:</strong></p>
+                                <br>
+                                <div class="check-item"><span class="check-txt">• Banana</span></div>
+                                <div class="check-item"><span class="check-txt">• Pão integral</span></div>
+                            </div>
+                        ` : ''}
+
+                        ${tab === 'cafe' ? `
+                            <div class="card">
+                                <div class="card-header"><h3 class="card-title">☕ Café da Manhã</h3></div>
+                                <p><strong>Opção 1:</strong></p>
+                                <div class="check-item"><span class="check-txt">• 2 fatias de pão integral + 2 ovos</span></div>
+                                <br>
+                                <p><strong>Opção 2:</strong></p>
+                                <div class="check-item"><span class="check-txt">• Banana + Pão integral + Requeijão Light</span></div>
+                            </div>
+                        ` : ''}
+
+                        ${tab === 'almoco' ? `
+                            <div class="card">
+                                <div class="card-header"><h3 class="card-title">🥗 Almoço Balanceado</h3></div>
+                                <div class="check-item"><span class="check-txt">• Arroz</span></div>
+                                <div class="check-item"><span class="check-txt">• Feijão</span></div>
+                                <div class="check-item"><span class="check-txt">• Carne ou Frango</span></div>
+                                <div class="check-item"><span class="check-txt">• Salada fresca</span></div>
+                                <div class="check-item"><span class="check-txt">• Couve ou Abobrinha</span></div>
+                            </div>
+                        ` : ''}
+
+                        ${tab === 'lanche' ? `
+                            <div class="card">
+                                <div class="card-header"><h3 class="card-title">🍎 Lanche da Tarde</h3></div>
+                                <div class="check-item"><span class="check-txt">• Frutas variadas da sua preferência</span></div>
+                            </div>
+                        ` : ''}
+
+                        ${tab === 'sobremesa' ? `
+                            <div class="card">
+                                <div class="card-header"><h3 class="card-title">🍓 Sobremesas Fit</h3></div>
+                                <div class="check-item"><span class="check-txt">• Gelatina Zero</span></div>
+                                <div class="check-item"><span class="check-txt">• Morangos frescos</span></div>
+                                <div class="check-item"><span class="check-txt">• Uvas congeladas</span></div>
+                                <div class="check-item"><span class="check-txt">• Banana com canela aquecida</span></div>
+                            </div>
+                        ` : ''}
+
+                        ${tab === 'jantar' ? `
+                            <div class="card">
+                                <div class="card-header"><h3 class="card-title">🍲 Jantar (Escolha 1)</h3></div>
+                                <div class="check-item"><span class="check-txt">• Marmitas fit preparadas</span></div>
+                                <div class="check-item"><span class="check-txt">• Omelete recheado</span></div>
+                                <div class="check-item"><span class="check-txt">• Batata assada + Proteína</span></div>
+                                <div class="check-item"><span class="check-txt">• Saladas completas</span></div>
+                                <div class="check-item"><span class="check-txt">• Sopas leves</span></div>
+                            </div>
+                        ` : ''}
+                    `;
+                },
+
+                treinos() {
+                    const day = DB.selectedWorkoutDay;
+                    const workout = workoutsData[day];
+
+                    return `
+                        <div class="card">
+                            <label class="stat-lbl" style="display:block; margin-bottom:6px;">Selecione o Dia da Semana:</label>
+                            <select class="select-custom" onchange="app.setWorkoutDay(this.value)">
+                                <option value="segunda" ${day === 'segunda' ? 'selected' : ''}>Segunda-Feira — Glúteo & Posterior</option>
+                                <option value="terca" ${day === 'terca' ? 'selected' : ''}>Terça-Feira — Costas, Bíceps & Ombros</option>
+                                <option value="quarta" ${day === 'quarta' ? 'selected' : ''}>Quarta-Feira — Quadríceps & Glúteo Médio</option>
+                                <option value="quinta" ${day === 'quinta' ? 'selected' : ''}>Quinta-Feira — Costas, Braços & Core</option>
+                                <option value="sexta" ${day === 'sexta' ? 'selected' : ''}>Sexta-Feira — Descanso Ativo</option>
+                                <option value="sabado" ${day === 'sabado' ? 'selected' : ''}>Sábado — Glúteo Pump & Posterior</option>
+                                <option value="domingo" ${day === 'domingo' ? 'selected' : ''}>Domingo — Descanso Total</option>
+                            </select>
+
+                            <div class="card-header" style="margin-bottom:4px">
+                                <h3 class="card-title">🏋️‍♀️ ${workout.title}</h3>
+                            </div>
+                            <p style="font-size:0.85rem; margin-bottom:14px; color:var(--primary-pink-dark); font-weight:600;">${workout.desc}</p>
+
+                            ${workout.items.map((ex, idx) => {
+                                const key = `${day}_ex_${idx}`;
+                                const isDone = !!DB.workoutProgress[key];
+                                return `
+                                    <div class="check-item ${isDone ? 'completed' : ''}" onclick="app.toggleExercise('${day}', ${idx})">
+                                        <div class="check-content">
+                                            <div class="checkbox">${isDone ? '✓' : ''}</div>
+                                            <span class="check-txt">${ex}</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+
+                            <button class="btn-primary" onclick="app.toast('Treino do dia finalizado com sucesso! 💪✨')">Concluir Treino de Hoje</button>
+                        </div>
+                    `;
+                },
+
+                agua() {
+                    const pct = Math.min(100, Math.round((DB.water.current / DB.water.target) * 100));
+                    return `
+                        <div class="card" style="text-align:center">
+                            <h3>Meta Diária de Água</h3>
+                            <p style="margin-top:4px; font-weight:600; color:var(--primary-pink-dark);">${DB.water.current}ml de ${DB.water.target}ml (${pct}%)</p>
+                            
+                            <div class="water-bottle">
+                                <div class="water-fill" style="height: ${pct}%"></div>
+                            </div>
+
+                            <div class="grid-2" style="margin-bottom: 10px;">
+                                <button class="btn-primary" style="background:var(--water-blue)" onclick="app.addWater(250)">+250 ml</button>
+                                <button class="btn-primary" style="background:var(--water-blue)" onclick="app.addWater(500)">+500 ml</button>
+                            </div>
+
+                            <div class="grid-2">
+                                <button class="btn-primary" style="background:#FCA5A5" onclick="app.addWater(-250)">-250 ml</button>
+                                <button class="btn-primary" style="background:var(--text-muted)" onclick="app.resetWater()">Zerar</button>
+                            </div>
+                        </div>
+                    `;
+                },
+
+                espiritual() {
+                    const rosaryDayKey = DB.selectedRosaryDay;
+                    const rosary = rosaryData[rosaryDayKey];
+
+                    return `
+                        <div class="card">
+                            <label class="stat-lbl" style="display:block; margin-bottom:6px;">Selecione o Dia da Semana:</label>
+                            <select class="select-custom" onchange="app.setRosaryDay(this.value)">
+                                <option value="segunda" ${rosaryDayKey === 'segunda' ? 'selected' : ''}>Segunda-Feira — Mistérios Gozosos</option>
+                                <option value="terca" ${rosaryDayKey === 'terca' ? 'selected' : ''}>Terça-Feira — Mistérios Dolorosos</option>
+                                <option value="quarta" ${rosaryDayKey === 'quarta' ? 'selected' : ''}>Quarta-Feira — Mistérios Gloriosos</option>
+                                <option value="quinta" ${rosaryDayKey === 'quinta' ? 'selected' : ''}>Quinta-Feira — Mistérios Luminosos</option>
+                                <option value="sexta" ${rosaryDayKey === 'sexta' ? 'selected' : ''}>Sexta-Feira — Mistérios Dolorosos</option>
+                                <option value="sabado" ${rosaryDayKey === 'sabado' ? 'selected' : ''}>Sábado — Mistérios Gozosos</option>
+                                <option value="domingo" ${rosaryDayKey === 'domingo' ? 'selected' : ''}>Domingo — Mistérios Gloriosos</option>
+                            </select>
+
+                            <div class="card-header" style="margin-bottom:4px">
+                                <h3 class="card-title">✨ ${rosary.title}</h3>
+                            </div>
+                            <p style="font-size:0.85rem; margin-bottom:14px; color:var(--primary-pink-dark); font-weight:600;">Meditação Diária do Santo Terço</p>
+
+                            ${rosary.items.map(misterio => `
+                                <div class="check-item" style="cursor:default;">
+                                    <span class="check-txt" style="font-weight:500;">${misterio}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                },
+
+                financeiro() {
+                    const monthKey = DB.selectedFinanceMonth;
+                    let paidCount = 0;
+
+                    financeItems.forEach(item => {
+                        const key = `fin_${monthKey}_${item}`;
+                        if (DB.financeState[key]) paidCount++;
+                    });
+
+                    const pct = Math.round((paidCount / financeItems.length) * 100);
+
+                    const subtabsHTML = financeMonthsList.map(m => `
+                        <button class="subtab-btn ${m.key === monthKey ? 'active' : ''}" onclick="app.setFinanceMonth('${m.key}')">${m.label}</button>
+                    `).join('');
+
+                    return `
+                        <div class="subtabs">
+                            ${subtabsHTML}
+                        </div>
+
+                        <div class="card progress-ring-card">
+                            <div class="ring-container">
+                                <svg width="80" height="80">
+                                    <circle cx="40" cy="40" r="32" stroke="#F0D5E1" stroke-width="8" fill="none"/>
+                                    <circle cx="40" cy="40" r="32" stroke="#C97A9C" stroke-width="8" fill="none" stroke-dasharray="201" stroke-dashoffset="${201 - (201 * pct) / 100}" stroke-linecap="round"/>
+                                </svg>
+                                <div class="ring-text">${pct}%</div>
+                            </div>
+                            <div>
+                                <h3>Contas do Mês</h3>
+                                <p style="font-size:0.85rem">${paidCount} de ${financeItems.length} contas pagas neste mês.</p>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header"><h3 class="card-title">Checklist de Pagamentos</h3></div>
+                            ${financeItems.map(item => {
+                                const key = `fin_${monthKey}_${item}`;
+                                const isPaid = !!DB.financeState[key];
+                                return `
+                                    <div class="check-item ${isPaid ? 'completed' : ''}" onclick="app.toggleFinanceItem('${item}')">
+                                        <div class="check-content">
+                                            <div class="checkbox">${isPaid ? '✓' : ''}</div>
+                                            <span class="check-txt">${item}</span>
+                                        </div>
+                                        <span style="font-size:0.75rem; font-weight:700; color:${isPaid ? 'var(--primary-pink-dark)' : 'var(--text-muted)'}">
+                                            ${isPaid ? 'PAGO' : 'PENDENTE'}
+                                        </span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                },
+
+                perfil() {
+                    return `
+                        <div class="card">
+                            <h3>Perfil da Vanessa</h3>
+                            <br>
+                            <div class="check-item"><span class="check-txt">Idade: ${DB.user.age} anos</span></div>
+                            <div class="check-item"><span class="check-txt">Altura: ${DB.user.height}</span></div>
+                            <div class="check-item"><span class="check-txt">Peso Atual: ${DB.user.weight} kg</span></div>
+                            <div class="check-item"><span class="check-txt">Meta de Peso: ${DB.user.targetWeight} kg</span></div>
+                        </div>
+                        <div class="card">
+                            <h3>Objetivos Principais</h3>
+                            <p style="margin-top:8px; line-height:1.6">• Emagrecer e definir pernas/glúteos<br>• Desenhar costas para afinar a cintura<br>• Atingir 50kg com foco e constância</p>
+                        </div>
+                    `;
+                }
             }
-        }
-
-        function renderFullTable() {
-            const tbody = document.getElementById('fullTableBody');
-            tbody.innerHTML = '';
-
-            let data = getFilteredData();
-            if (selectedGroupFilter !== 'ALL') {
-                data = data.filter(d => d.grupo === selectedGroupFilter);
-            }
-
-            data.forEach(d => {
-                const tr = document.createElement('tr');
-                tr.style.borderBottom = '1px solid var(--border)';
-                tr.innerHTML = `
-                    <td>${d.data}</td>
-                    <td><span class="badge">${d.grupo}</span></td>
-                    <td>${d.cat}</td>
-                    <td>${d.subcat}</td>
-                    <td>${d.desc}</td>
-                    <td>${d.forn}</td>
-                    <td>${d.freq}</td>
-                    <td class="text-right"><strong>${formatCurrency(d.val)}</strong></td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        window.onload = function() {
-            lucide.createIcons();
-            updateDashboard();
         };
+
+        window.onload = () => app.init();
     </script>
 </body>
 </html>
