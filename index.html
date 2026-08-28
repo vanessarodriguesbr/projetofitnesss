@@ -1,868 +1,925 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#FAF0F4">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Planner V">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>Planner diário</title>
-
-    <!-- Ícones dinâmicos em SVG (Fundo Rosa Claro com "V" Rosa) -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='128' fill='%23FCE8F0'/><text x='50%20' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='280' fill='%23C97A9C'>V</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='128' fill='%23FCE8F0'/><text x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='800' font-size='280' fill='%23C97A9C'>V</text></svg>">
+<!-- saved from url=(0041)https://shiny-kashata-feb060.netlify.app/ -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Geral de Custos Administrativos</title>
+    <!-- Chart.js CDN -->
+    <script src="./Dashboard Geral de Custos Administrativos_files/chart.js.transferir"></script>
+    <!-- Lucide Icons -->
+    <script src="./Dashboard Geral de Custos Administrativos_files/lucide@latest"></script>
     <style>
         :root {
-            --bg-main: #FAF0F4;
-            --bg-card: #FFFFFF;
-            --bg-secondary: #F7E4EC;
-            --primary-pink: #E8A0BF;
-            --primary-pink-light: #FCE8F0;
-            --primary-pink-dark: #C97A9C;
-            --blush-accent: #F4C2C2;
-            --water-blue: #93C5FD;
-            --water-blue-light: #EFF6FF;
-            --text-primary: #2D2727;
-            --text-secondary: #786F6F;
-            --text-muted: #A39B9B;
-            --border-color: #F0D5E1;
-            --border-radius-s: 12px;
-            --border-radius-m: 20px;
-            --border-radius-l: 28px;
-            --border-radius-full: 9999px;
-            --shadow-card: 0 4px 20px rgba(232, 160, 191, 0.12);
-            --shadow-floating: 0 12px 35px rgba(232, 160, 191, 0.3);
-            --font-primary: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
-            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-main: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --primary: #1f497d;
+            --primary-light: #e8f0fe;
+            --accent: #2563eb;
+            --border: #e5e7eb;
+            --hover-bg: #f8fafc;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        body { background-color: var(--bg-main); color: var(--text-primary); font-family: var(--font-primary); min-height: 100vh; padding-bottom: calc(85px + env(safe-area-inset-bottom)); }
-        h1, h2, h3 { font-weight: 600; letter-spacing: -0.02em; }
-        p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: rgba(250, 240, 244, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--border-color); padding-top: calc(16px + env(safe-area-inset-top)); }
-        .greeting-subtitle { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary-pink-dark); font-weight: 700; }
-        .greeting-title { font-size: 1.25rem; color: var(--text-primary); }
-        .avatar-container { width: 42px; height: 42px; border-radius: var(--border-radius-full); background: linear-gradient(135deg, var(--primary-pink), var(--primary-pink-dark)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.1rem; box-shadow: var(--shadow-card); cursor: pointer; border: 2px solid #FFF; }
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-        .viewport { padding: 12px 20px 30px; max-width: 600px; margin: 0 auto; }
-        .view-screen { animation: fadeInSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes fadeInSlide { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
 
-        .card { background: var(--bg-card); border-radius: var(--border-radius-m); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-card); border: 1px solid var(--border-color); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .card-title { font-size: 1.05rem; display: flex; align-items: center; gap: 8px; color: var(--text-primary); }
-        
-        .progress-ring-card { display: flex; align-items: center; gap: 20px; background: linear-gradient(135deg, #FFFFFF, #FDF0F5); }
-        .ring-container { position: relative; width: 80px; height: 80px; flex-shrink: 0; }
-        .ring-container svg { transform: rotate(-90deg); }
-        .ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 700; font-size: 1rem; color: var(--primary-pink-dark); }
+        header h1 {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
 
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .stat-box { background: var(--primary-pink-light); padding: 12px; border-radius: var(--border-radius-s); text-align: center; border: 1px solid var(--border-color); cursor: pointer; }
-        .stat-val { font-size: 1.15rem; font-weight: 700; color: var(--primary-pink-dark); }
-        .stat-lbl { font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; }
+        header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
 
-        /* Checklist Interativo com Suporte a Touch & Drag */
-        .check-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: var(--bg-main); border-radius: var(--border-radius-s); margin-bottom: 8px; transition: transform 0.15s ease, background-color 0.2s ease; border: 1px solid transparent; gap: 10px; touch-action: none; }
-        .check-item.dragging { opacity: 0.6; transform: scale(1.02); border: 2px dashed var(--primary-pink); background: white; box-shadow: var(--shadow-floating); z-index: 10; }
-        .check-item.completed { background: var(--primary-pink-light); }
-        .check-item.completed .check-txt { text-decoration: line-through; color: var(--text-muted); }
-        .check-content { display: flex; align-items: center; gap: 12px; flex: 1; }
-        .checkbox { width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--primary-pink); background: white; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; flex-shrink: 0; cursor: pointer; }
-        .check-item.completed .checkbox { background: var(--primary-pink); color: white; }
-        .drag-handle { color: var(--primary-pink-dark); font-size: 1.2rem; padding: 4px 8px; cursor: grab; font-weight: bold; }
+        /* Month Selector Selector Bar */
+        .month-selector-bar {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
 
-        .btn-primary { width: 100%; background: linear-gradient(135deg, var(--primary-pink), var(--primary-pink-dark)); color: white; border: none; padding: 14px; border-radius: var(--border-radius-m); font-weight: 600; font-size: 0.95rem; box-shadow: var(--shadow-floating); cursor: pointer; margin-top: 8px; }
-        .btn-primary:active { transform: scale(0.98); }
+        .month-selector-bar label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-        .select-custom { width: 100%; padding: 12px; border-radius: var(--border-radius-s); border: 1px solid var(--border-color); background: white; font-family: inherit; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; outline: none; cursor: pointer; box-shadow: var(--shadow-card); }
+        .month-select {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #f8fafc;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
 
-        .calendar-bar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
-        .day-card { flex: 1; min-width: 44px; padding: 10px 0; text-align: center; background: white; border-radius: var(--border-radius-s); border: 1px solid var(--border-color); cursor: pointer; }
-        .day-card.active { background: var(--primary-pink); color: white; border-color: var(--primary-pink); }
-        .day-card.active .day-name { color: white; }
-        .day-name { font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); }
+        .month-select:hover {
+            border-color: var(--primary);
+        }
 
-        .water-bottle { height: 160px; width: 90px; border: 3px solid var(--water-blue); border-radius: 20px; margin: 15px auto; position: relative; overflow: hidden; background: #FFF; }
-        .water-fill { position: absolute; bottom: 0; width: 100%; background: linear-gradient(180deg, #A5F3FC, var(--water-blue)); transition: height 0.5s ease; }
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
 
-        /* Navegação Ajustada para Mobile e Safe Area */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; padding-bottom: env(safe-area-inset-bottom); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 100; height: calc(65px + env(safe-area-inset-bottom)); }
-        .nav-item { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 0.62rem; font-weight: 600; cursor: pointer; flex: 1; padding-top: 6px; }
-        .nav-item svg { width: 19px; height: 19px; stroke: var(--text-muted); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .nav-item.active { color: var(--primary-pink-dark); }
-        .nav-item.active svg { stroke: var(--primary-pink-dark); }
+        .kpi-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
 
-        .subtabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; scrollbar-width: none; }
-        .subtab-btn { background: white; border: 1px solid var(--border-color); padding: 8px 14px; border-radius: var(--border-radius-full); font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; cursor: pointer; }
-        .subtab-btn.active { background: var(--primary-pink-dark); color: white; border-color: var(--primary-pink-dark); }
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: white; padding: 10px 20px; border-radius: var(--border-radius-full); font-size: 0.85rem; z-index: 200; display: none; box-shadow: var(--shadow-floating); }
+        .kpi-info h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .kpi-info p {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Layout Grid */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .dash-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Filter Pills */
+        .filter-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .filter-btn {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Interactive Drilldown Table */
+        .drill-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .drill-table th {
+            background: #f8fafc;
+            text-align: left;
+            padding: 10px 12px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .drill-table tr.row-group {
+            background-color: #f8fafc;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .drill-table tr.row-group:hover {
+            background-color: var(--primary-light);
+        }
+
+        .drill-table tr.row-cat {
+            background-color: #ffffff;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            display: none;
+        }
+
+        .drill-table tr.row-cat:hover {
+            background-color: #f1f5f9;
+        }
+
+        .drill-table tr.row-desc {
+            background-color: #fafafa;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border);
+            display: none;
+        }
+
+        .drill-table td {
+            padding: 10px 12px;
+        }
+
+        .indent-1 {
+            padding-left: 28px !important;
+        }
+
+        .indent-2 {
+            padding-left: 48px !important;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .toggle-icon {
+            display: inline-block;
+            width: 16px;
+            transition: transform 0.2s;
+        }
+
+        .expanded > td > .toggle-icon {
+            transform: rotate(90deg);
+        }
     </style>
 </head>
 <body>
 
-    <header class="top-bar">
+    <header>
         <div>
-            <span class="greeting-subtitle">Planner diário</span>
-            <h1 class="greeting-title" id="current-date-title">Segunda-Feira</h1>
+            <h1>Dashboard Interativo de Custos Administrativos</h1>
+            <p>Visão Executiva com navegação detalhada por Mês e Hierarquia de Gastos</p>
         </div>
-        <div class="avatar-container" onclick="app.nav('perfil')">V</div>
+        <div class="month-selector-bar">
+            <label for="monthSelect"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="calendar" aria-hidden="true" class="lucide lucide-calendar"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18"></path></svg> Período / Mês:</label>
+            <select id="monthSelect" class="month-select" onchange="onMonthChange()">
+                <option value="ALL" selected="">Visão Geral (Todos os Meses)</option>
+                <option value="01/2026">Janeiro / 2026</option>
+                <option value="02/2026">Fevereiro / 2026</option>
+                <option value="03/2026">Março / 2026</option>
+                <option value="04/2026">Abril / 2026</option>
+                <option value="05/2026">Maio / 2026</option>
+                <option value="06/2026">Junho / 2026</option>
+                <option value="07/2026">Julho / 2026</option>
+                <option value="08/2026">Agosto / 2026</option>
+            </select>
+        </div>
     </header>
 
-    <main id="app-viewport" class="viewport"></main>
-    <div id="toast" class="toast"></div>
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="dollar-sign" aria-hidden="true" class="lucide lucide-dollar-sign"><line x1="12" x2="12" y1="2" y2="22"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+            <div class="kpi-info">
+                <h3>Custo Total</h3>
+                <p id="kpi-total">R$ 11.375,85</p>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="file-text" aria-hidden="true" class="lucide lucide-file-text"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg></div>
+            <div class="kpi-info">
+                <h3>Lançamentos</h3>
+                <p id="kpi-count">15 itens</p>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="pie-chart" aria-hidden="true" class="lucide lucide-pie-chart"><path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"></path><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path></svg></div>
+            <div class="kpi-info">
+                <h3>Maior Centro de Custo</h3>
+                <p id="kpi-top">PREDIAL (39.9%)</p>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trending-up" aria-hidden="true" class="lucide lucide-trending-up"><path d="M16 7h6v6"></path><path d="m22 7-8.5 8.5-5-5L2 17"></path></svg></div>
+            <div class="kpi-info">
+                <h3>Ticket Médio / Item</h3>
+                <p id="kpi-avg">R$ 758,39</p>
+            </div>
+        </div>
+    </div>
 
-    <nav class="bottom-nav">
-        <button class="nav-item active" onclick="app.nav('dashboard')">
-            <svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Início</span>
-        </button>
-        <button class="nav-item" onclick="app.nav('alimentacao')">
-            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span>Nutrição</span>
-        </button>
-        <button class="nav-item" onclick="app.nav('treinos')">
-            <svg viewBox="0 0 24 24"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/></svg>
-            <span>Treinos</span>
-        </button>
-        <button class="nav-item" onclick="app.nav('agua')">
-            <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-            <span>Água</span>
-        </button>
-        <button class="nav-item" onclick="app.nav('espiritual')">
-            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <span>Espiritual</span>
-        </button>
-        <button class="nav-item" onclick="app.nav('financeiro')">
-            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            <span>Finanças</span>
-        </button>
-        <button class="nav-item" onclick="app.nav('perfil')">
-            <svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Perfil</span>
-        </button>
-    </nav>
+    <!-- Main Charts Section -->
+    <div class="dash-grid">
+        <!-- Donut Chart Card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="pie-chart" aria-hidden="true" class="lucide lucide-pie-chart"><path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"></path><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path></svg> Distribuição Por Centros de Custos</div>
+            </div>
+            <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="costChart" style="box-sizing: border-box; display: block; height: 320px; width: 622px;" width="622" height="320"></canvas>
+            </div>
+        </div>
+
+        <!-- Interactive Drilldown List -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="list-tree" aria-hidden="true" class="lucide lucide-list-tree"><path d="M8 5h13"></path><path d="M13 12h8"></path><path d="M13 19h8"></path><path d="M3 10a2 2 0 0 0 2 2h3"></path><path d="M3 5v12a2 2 0 0 0 2 2h3"></path></svg> Detalhamento Interativo (Grupo &gt; Categoria)</div>
+                <span class="badge">Clique em um grupo para expandir</span>
+            </div>
+            <div style="max-height: 320px; overflow-y: auto;">
+                <table class="drill-table">
+                    <thead>
+                        <tr>
+                            <th>Estrutura / Custo</th>
+                            <th class="text-right">% Part.</th>
+                            <th class="text-right">Valor (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="drillBody"><tr class="row-group">
+                    <td><span class="toggle-icon">▶</span> <strong>PREDIAL</strong></td>
+                    <td class="text-right"><span class="badge">39.9%</span></td>
+                    <td class="text-right"><strong>R$ 4.534,47</strong></td>
+                </tr><tr class="row-cat grp-0">
+                        <td class="indent-1"><span class="toggle-icon">▶</span> LIMPEZA</td>
+                        <td class="text-right"><span class="badge" style="background:#f1f5f9">73.9% do grupo</span></td>
+                        <td class="text-right">R$ 3.350,00</td>
+                    </tr><tr class="row-desc grp-0-cat-0">
+                            <td class="indent-2" style="color:#475569;">• CONTRATAÇÃO DA LARISSA SERVICE (LARISSA SERVICE)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">MENSAL</span></td>
+                            <td class="text-right">R$ 3.350,00</td>
+                        </tr><tr class="row-cat grp-0">
+                        <td class="indent-1"><span class="toggle-icon">▶</span> MANUTENÇÃO</td>
+                        <td class="text-right"><span class="badge" style="background:#f1f5f9">26.1% do grupo</span></td>
+                        <td class="text-right">R$ 1.184,47</td>
+                    </tr><tr class="row-desc grp-0-cat-1">
+                            <td class="indent-2" style="color:#475569;">• COMPRA DE PISTÃO PARA TROCA DOS ELEVADORES USADOS PARA DICICLOS (GRUPO OVD)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">ÚNICA</span></td>
+                            <td class="text-right">R$ 164,47</td>
+                        </tr><tr class="row-desc grp-0-cat-1">
+                            <td class="indent-2" style="color:#475569;">• INSTALAÇÃO DE FILTRO DE PRESSÃO DE AR (GP COMPRESSORES)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">ÚNICA</span></td>
+                            <td class="text-right">R$ 1.020,00</td>
+                        </tr><tr class="row-group">
+                    <td><span class="toggle-icon">▶</span> <strong>CORPORATIVO</strong></td>
+                    <td class="text-right"><span class="badge">28.5%</span></td>
+                    <td class="text-right"><strong>R$ 3.246,57</strong></td>
+                </tr><tr class="row-cat grp-1">
+                        <td class="indent-1"><span class="toggle-icon">▶</span> ENDOMARKETING</td>
+                        <td class="text-right"><span class="badge" style="background:#f1f5f9">12.9% do grupo</span></td>
+                        <td class="text-right">R$ 420,00</td>
+                    </tr><tr class="row-desc grp-1-cat-0">
+                            <td class="indent-2" style="color:#475569;">• COMPRA DO BOLO PARA ANIVERSARIANTES (GF CONFEITARIA)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">MENSAL</span></td>
+                            <td class="text-right">R$ 210,00</td>
+                        </tr><tr class="row-desc grp-1-cat-0">
+                            <td class="indent-2" style="color:#475569;">• COMPRA DO BOLO PARA ANIVERSARIANTES (GF CONFEITARIA)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">MENSAL</span></td>
+                            <td class="text-right">R$ 210,00</td>
+                        </tr><tr class="row-cat grp-1">
+                        <td class="indent-1"><span class="toggle-icon">▶</span> PEDIDO DE COMPRAS</td>
+                        <td class="text-right"><span class="badge" style="background:#f1f5f9">68.6% do grupo</span></td>
+                        <td class="text-right">R$ 2.226,57</td>
+                    </tr><tr class="row-desc grp-1-cat-1">
+                            <td class="indent-2" style="color:#475569;">• ITENS DE INSUMOS QUE PRECISAM DE REPOSIÇÃO MENSAL ASSIM COMO ITENS PARA MELHORIAS (-)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">MENSAL</span></td>
+                            <td class="text-right">R$ 1.258,88</td>
+                        </tr><tr class="row-desc grp-1-cat-1">
+                            <td class="indent-2" style="color:#475569;">• COMPRA DE ROUPAS PROFISSIONAIS E DE MATERIAS DE PROTEÇÃO (-)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">ÚNICA</span></td>
+                            <td class="text-right">R$ 882,56</td>
+                        </tr><tr class="row-desc grp-1-cat-1">
+                            <td class="indent-2" style="color:#475569;">• COMPRA DE INSUMOS PARA COMPOR O KIT DE PRIMEIROS SOCORROS (PAGUEMENOS)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">ÚNICA</span></td>
+                            <td class="text-right">R$ 85,13</td>
+                        </tr><tr class="row-cat grp-1">
+                        <td class="indent-1"><span class="toggle-icon">▶</span> LAUDOS E CERTIFICADOS</td>
+                        <td class="text-right"><span class="badge" style="background:#f1f5f9">18.5% do grupo</span></td>
+                        <td class="text-right">R$ 600,00</td>
+                    </tr><tr class="row-desc grp-1-cat-2">
+                            <td class="indent-2" style="color:#475569;">• ATUALIZAÇÃO DO LAUDO ERGONOMICO PARA DICICLOS (POSTURE)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">ÚNICA</span></td>
+                            <td class="text-right">R$ 600,00</td>
+                        </tr><tr class="row-group">
+                    <td><span class="toggle-icon">▶</span> <strong>COMERCIAL</strong></td>
+                    <td class="text-right"><span class="badge">19.8%</span></td>
+                    <td class="text-right"><strong>R$ 2.250,90</strong></td>
+                </tr><tr class="row-cat grp-2">
+                        <td class="indent-1"><span class="toggle-icon">▶</span> MATERIAIS PROMOCIONAIS</td>
+                        <td class="text-right"><span class="badge" style="background:#f1f5f9">90.3% do grupo</span></td>
+                        <td class="text-right">R$ 2.031,90</td>
+                    </tr><tr class="row-desc grp-2-cat-0">
+                            <td class="indent-2" style="color:#475569;">• REALIZADO A COMPRA DE FOLHETOS PARA PARTICIPAÇÃO DA FEIRA COP (3TORRES)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">ÚNICA</span></td>
+                            <td class="text-right">R$ 2.031,90</td>
+                        </tr><tr class="row-cat grp-2">
+                        <td class="indent-1"><span class="toggle-icon">▶</span> UNIFORME</td>
+                        <td class="text-right"><span class="badge" style="background:#f1f5f9">9.7% do grupo</span></td>
+                        <td class="text-right">R$ 219,00</td>
+                    </tr><tr class="row-desc grp-2-cat-1">
+                            <td class="indent-2" style="color:#475569;">• COMPRA DE CAMSIA SOCIAL PARA LUANA (FASCYNIOS)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">ÚNICA</span></td>
+                            <td class="text-right">R$ 189,00</td>
+                        </tr><tr class="row-desc grp-2-cat-1">
+                            <td class="indent-2" style="color:#475569;">• CAMISA SOCIAL BORDADO COM A LOGO BRMOBILITY (TATO SERVIÇOS)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">ÚNICA</span></td>
+                            <td class="text-right">R$ 30,00</td>
+                        </tr><tr class="row-group">
+                    <td><span class="toggle-icon">▶</span> <strong>TI</strong></td>
+                    <td class="text-right"><span class="badge">5.8%</span></td>
+                    <td class="text-right"><strong>R$ 662,00</strong></td>
+                </tr><tr class="row-cat grp-3">
+                        <td class="indent-1"><span class="toggle-icon">▶</span> AQUISIÇÃO</td>
+                        <td class="text-right"><span class="badge" style="background:#f1f5f9">100.0% do grupo</span></td>
+                        <td class="text-right">R$ 662,00</td>
+                    </tr><tr class="row-desc grp-3-cat-0">
+                            <td class="indent-2" style="color:#475569;">• AQUISIÇÃO DE UM MONITOR A PEDIDO DA JESSICA (MERCADOLIVRE)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">ÚNICA</span></td>
+                            <td class="text-right">R$ 662,00</td>
+                        </tr><tr class="row-group">
+                    <td><span class="toggle-icon">▶</span> <strong>BENS MATERIAIS</strong></td>
+                    <td class="text-right"><span class="badge">0.5%</span></td>
+                    <td class="text-right"><strong>R$ 54,91</strong></td>
+                </tr><tr class="row-cat grp-4">
+                        <td class="indent-1"><span class="toggle-icon">▶</span> AQUISIÇÃO</td>
+                        <td class="text-right"><span class="badge" style="background:#f1f5f9">100.0% do grupo</span></td>
+                        <td class="text-right">R$ 54,91</td>
+                    </tr><tr class="row-desc grp-4-cat-0">
+                            <td class="indent-2" style="color:#475569;">• AQUISIÇÃO DE SUPORTE PARA MONITOR A PEDIDO DA JESSICA (MERCADOLIVRE)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">ÚNICA</span></td>
+                            <td class="text-right">R$ 54,91</td>
+                        </tr><tr class="row-group">
+                    <td><span class="toggle-icon">▶</span> <strong>FROTA</strong></td>
+                    <td class="text-right"><span class="badge">5.5%</span></td>
+                    <td class="text-right"><strong>R$ 627,00</strong></td>
+                </tr><tr class="row-cat grp-5">
+                        <td class="indent-1"><span class="toggle-icon">▶</span> MANUTENÇÃO</td>
+                        <td class="text-right"><span class="badge" style="background:#f1f5f9">100.0% do grupo</span></td>
+                        <td class="text-right">R$ 627,00</td>
+                    </tr><tr class="row-desc grp-5-cat-0">
+                            <td class="indent-2" style="color:#475569;">• FOI FEITO A MANUTENÇÃO NO SISTEMA DE FREIOS DA FIORINO (ISA AUTO CENTER)</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">ÚNICA</span></td>
+                            <td class="text-right">R$ 627,00</td>
+                        </tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Table List -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="table" aria-hidden="true" class="lucide lucide-table"><path d="M12 3v18"></path><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path><path d="M3 15h18"></path></svg> Tabela Completa de Despesas</div>
+            <div class="filter-container" id="group-filter-pills">
+                <button class="filter-btn active" onclick="filterTableGroup(&#39;ALL&#39;, this)">Todos os Grupos</button>
+                <button class="filter-btn" onclick="filterTableGroup(&#39;CORPORATIVO&#39;, this)">Corporativo</button>
+                <button class="filter-btn" onclick="filterTableGroup(&#39;PREDIAL&#39;, this)">Predial</button>
+                <button class="filter-btn" onclick="filterTableGroup(&#39;TI&#39;, this)">TI</button>
+                <button class="filter-btn" onclick="filterTableGroup(&#39;COMERCIAL&#39;, this)">Comercial</button>
+                <button class="filter-btn" onclick="filterTableGroup(&#39;FROTA&#39;, this)">Frota</button>
+                <button class="filter-btn" onclick="filterTableGroup(&#39;BENS MATERIAIS&#39;, this)">Bens Materiais</button>
+            </div>
+        </div>
+        <div style="overflow-x: auto; max-height: 450px;">
+            <table class="drill-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Grupo</th>
+                        <th>Categoria</th>
+                        <th>Subcategoria</th>
+                        <th>Descrição do Custo</th>
+                        <th>Fornecedor</th>
+                        <th>Frequência</th>
+                        <th class="text-right">Valor (R$)</th>
+                    </tr>
+                </thead>
+                <tbody id="fullTableBody"><tr>
+                    <td>04/08/2026</td>
+                    <td><strong>PREDIAL</strong></td>
+                    <td>LIMPEZA</td>
+                    <td>TERCEIRIZADOS</td>
+                    <td>CONTRATAÇÃO DA LARISSA SERVICE</td>
+                    <td>LARISSA SERVICE</td>
+                    <td><span class="badge">MENSAL</span></td>
+                    <td class="text-right"><strong>R$ 3.350,00</strong></td>
+                </tr><tr>
+                    <td>04/08/2026</td>
+                    <td><strong>CORPORATIVO</strong></td>
+                    <td>ENDOMARKETING</td>
+                    <td>ANIVERSARIANTES</td>
+                    <td>COMPRA DO BOLO PARA ANIVERSARIANTES</td>
+                    <td>GF CONFEITARIA</td>
+                    <td><span class="badge">MENSAL</span></td>
+                    <td class="text-right"><strong>R$ 210,00</strong></td>
+                </tr><tr>
+                    <td>05/08/2026</td>
+                    <td><strong>PREDIAL</strong></td>
+                    <td>MANUTENÇÃO</td>
+                    <td>LABORATORIO</td>
+                    <td>COMPRA DE PISTÃO PARA TROCA DOS ELEVADORES USADOS PARA DICICLOS</td>
+                    <td>GRUPO OVD</td>
+                    <td><span class="badge">ÚNICA</span></td>
+                    <td class="text-right"><strong>R$ 164,47</strong></td>
+                </tr><tr>
+                    <td>06/08/2026</td>
+                    <td><strong>COMERCIAL</strong></td>
+                    <td>MATERIAIS PROMOCIONAIS</td>
+                    <td>FOLHETO E CARTÕES DE VISITA</td>
+                    <td>REALIZADO A COMPRA DE FOLHETOS PARA PARTICIPAÇÃO DA FEIRA COP</td>
+                    <td>3TORRES</td>
+                    <td><span class="badge">ÚNICA</span></td>
+                    <td class="text-right"><strong>R$ 2.031,90</strong></td>
+                </tr><tr>
+                    <td>10/08/2026</td>
+                    <td><strong>CORPORATIVO</strong></td>
+                    <td>PEDIDO DE COMPRAS</td>
+                    <td>MATERIAIS DE CONSUMO</td>
+                    <td>ITENS DE INSUMOS QUE PRECISAM DE REPOSIÇÃO MENSAL ASSIM COMO ITENS PARA MELHORIAS</td>
+                    <td>-</td>
+                    <td><span class="badge">MENSAL</span></td>
+                    <td class="text-right"><strong>R$ 1.258,88</strong></td>
+                </tr><tr>
+                    <td>10/08/2026</td>
+                    <td><strong>CORPORATIVO</strong></td>
+                    <td>PEDIDO DE COMPRAS</td>
+                    <td>PROTEÇÕES E UNIFORMES</td>
+                    <td>COMPRA DE ROUPAS PROFISSIONAIS E DE MATERIAS DE PROTEÇÃO</td>
+                    <td>-</td>
+                    <td><span class="badge">ÚNICA</span></td>
+                    <td class="text-right"><strong>R$ 882,56</strong></td>
+                </tr><tr>
+                    <td>10/08/2026</td>
+                    <td><strong>CORPORATIVO</strong></td>
+                    <td>PEDIDO DE COMPRAS</td>
+                    <td>KIT DE PRIMEIROS SOCORROS</td>
+                    <td>COMPRA DE INSUMOS PARA COMPOR O KIT DE PRIMEIROS SOCORROS</td>
+                    <td>PAGUEMENOS</td>
+                    <td><span class="badge">ÚNICA</span></td>
+                    <td class="text-right"><strong>R$ 85,13</strong></td>
+                </tr><tr>
+                    <td>17/08/2026</td>
+                    <td><strong>TI</strong></td>
+                    <td>AQUISIÇÃO</td>
+                    <td>EXTINTORES</td>
+                    <td>AQUISIÇÃO DE UM MONITOR A PEDIDO DA JESSICA</td>
+                    <td>MERCADOLIVRE</td>
+                    <td><span class="badge">ÚNICA</span></td>
+                    <td class="text-right"><strong>R$ 662,00</strong></td>
+                </tr><tr>
+                    <td>17/08/2026</td>
+                    <td><strong>BENS MATERIAIS</strong></td>
+                    <td>AQUISIÇÃO</td>
+                    <td>MOVEIS</td>
+                    <td>AQUISIÇÃO DE SUPORTE PARA MONITOR A PEDIDO DA JESSICA</td>
+                    <td>MERCADOLIVRE</td>
+                    <td><span class="badge">ÚNICA</span></td>
+                    <td class="text-right"><strong>R$ 54,91</strong></td>
+                </tr><tr>
+                    <td>19/08/2026</td>
+                    <td><strong>COMERCIAL</strong></td>
+                    <td>UNIFORME</td>
+                    <td>AQUISIÇÃO</td>
+                    <td>COMPRA DE CAMSIA SOCIAL PARA LUANA</td>
+                    <td>FASCYNIOS</td>
+                    <td><span class="badge">ÚNICA</span></td>
+                    <td class="text-right"><strong>R$ 189,00</strong></td>
+                </tr><tr>
+                    <td>19/08/2026</td>
+                    <td><strong>COMERCIAL</strong></td>
+                    <td>UNIFORME</td>
+                    <td>BORDADO</td>
+                    <td>CAMISA SOCIAL BORDADO COM A LOGO BRMOBILITY</td>
+                    <td>TATO SERVIÇOS</td>
+                    <td><span class="badge">ÚNICA</span></td>
+                    <td class="text-right"><strong>R$ 30,00</strong></td>
+                </tr><tr>
+                    <td>19/08/2026</td>
+                    <td><strong>CORPORATIVO</strong></td>
+                    <td>LAUDOS E CERTIFICADOS</td>
+                    <td>LAUDO ERGONOMICO</td>
+                    <td>ATUALIZAÇÃO DO LAUDO ERGONOMICO PARA DICICLOS</td>
+                    <td>POSTURE</td>
+                    <td><span class="badge">ÚNICA</span></td>
+                    <td class="text-right"><strong>R$ 600,00</strong></td>
+                </tr><tr>
+                    <td>19/08/2026</td>
+                    <td><strong>FROTA</strong></td>
+                    <td>MANUTENÇÃO</td>
+                    <td>SISTEMA DE FREIOS</td>
+                    <td>FOI FEITO A MANUTENÇÃO NO SISTEMA DE FREIOS DA FIORINO</td>
+                    <td>ISA AUTO CENTER</td>
+                    <td><span class="badge">ÚNICA</span></td>
+                    <td class="text-right"><strong>R$ 627,00</strong></td>
+                </tr><tr>
+                    <td>24/08/2026</td>
+                    <td><strong>CORPORATIVO</strong></td>
+                    <td>ENDOMARKETING</td>
+                    <td>ANIVERSARIANTES</td>
+                    <td>COMPRA DO BOLO PARA ANIVERSARIANTES</td>
+                    <td>GF CONFEITARIA</td>
+                    <td><span class="badge">MENSAL</span></td>
+                    <td class="text-right"><strong>R$ 210,00</strong></td>
+                </tr><tr>
+                    <td>24/08/2026</td>
+                    <td><strong>PREDIAL</strong></td>
+                    <td>MANUTENÇÃO</td>
+                    <td>LABORATORIO</td>
+                    <td>INSTALAÇÃO DE FILTRO DE PRESSÃO DE AR</td>
+                    <td>GP COMPRESSORES</td>
+                    <td><span class="badge">ÚNICA</span></td>
+                    <td class="text-right"><strong>R$ 1.020,00</strong></td>
+                </tr></tbody>
+            </table>
+        </div>
+    </div>
 
     <script>
-        const DB = {
-            user: { name: 'Vanessa', age: 27, height: '1.52m', weight: 60, targetWeight: 50 },
-            water: { current: 750, target: 3000 },
-            selectedDayKey: 'segunda',
-            selectedNutriTab: 'pretreino',
-            selectedWorkoutDay: 'segunda',
-            selectedFinanceMonth: 'jan',
-            selectedRosaryDay: 'segunda',
-            workoutProgress: {},
-            checklistState: {},
-            customTasksOrder: {},
-            financeState: {}
+        const allData = [{"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PAPEL INTERFOLHA | CONSUMO MENSAL", "forn": "GIMBA", "val": 288.2, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PRATO DESCARTAVEL | CONSUMO MENSAL", "forn": "GIMBA", "val": 18.18, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "GARFO DESCARTAVEL | CONSUMO MENSAL", "forn": "GIMBA", "val": 10.53, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "GUARDANAPO | CONSUMO MENSAL", "forn": "GIMBA", "val": 10.79, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAFÉ EM PÓ | CONSUMO MENSAL", "forn": "GIMBA", "val": 64.81, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "COCA-COLA 2 LITROS | CONSUMO MENSAL", "forn": "GIMBA", "val": 43.53, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "FILTRO DE CAFÉ - 103 | CONSUMO MENSAL", "forn": "GIMBA", "val": 3.62, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "DETERGENTE - 5 LITROS | CONSUMO MENSAL", "forn": "GIMBA", "val": 24.81, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PAPEL HIGIENICO | CONSUMO MENSAL", "forn": "GIMBA", "val": 77.82, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "ESPONJA MULTIUSO | CONSUMO MENSAL", "forn": "GIMBA", "val": 9.73, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "BOM AR | CONSUMO MENSAL", "forn": "GIMBA", "val": 28.81, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "LENÇO UMEDECIDO | CONSUMO MENSAL", "forn": "GIMBA", "val": 70.79, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "MATERIAL DE ESCRITORIO", "desc": "FOLHA SULFITE", "forn": "GIMBA", "val": 97.53, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAFÉ EM GRÃOS", "forn": "MERCADOLIVRE", "val": 329.97, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "CAPACETE PARA PROTEÇÃO", "forn": "MERCADOLIVRE", "val": 160.0, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "LUVA X11 MASCULINA BLACKOU 2", "forn": "MERCADOLIVRE", "val": 67.8, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "COLETE PARA PROTEÇÃO", "forn": "MERCADOLIVRE", "val": 246.05, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "AROMATIZADOR DE AMBIENTE", "forn": "MERCADOLIVRE", "val": 217.79, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "06/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "MATERIAL DE ESCRITORIO", "desc": "CARREGADOR DURACELL - 4 PILHAS", "forn": "MERCADOLIVRE", "val": 217.79, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SABONETE LIQUIDO | CONSUMO MENSAL", "forn": "GIMBA", "val": 33.9, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PAPEL HIGIENICO | CONSUMO MENSAL", "forn": "GIMBA", "val": 78.99, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAFÉ EM PÓ | CONSUMO MENSAL", "forn": "GIMBA", "val": 32.99, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "FILTRO DE CAFÉ  | CONSUMO MENSAL", "forn": "GIMBA", "val": 9.58, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PAPEL INTERFOLHA | CONSUMO MENSAL", "forn": "GIMBA", "val": 231.56, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "GUARDANAPO | CONSUMO MENSAL", "forn": "GIMBA", "val": 5.98, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SACO DE LIXO | CONSUMO MENSAL", "forn": "GIMBA", "val": 321.87, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "AÇUCAR | CONSUMO MENSAL", "forn": "GIMBA", "val": 4.99, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "FOLHA SULFITE", "forn": "GIMBA", "val": 98.7, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CHALEIRA", "forn": "MERCADOLIVRE", "val": 48.9, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SABONETE LIQUIDO | CONSUMO MENSAL", "forn": "MERCADOLIVRE", "val": 23.3, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "LIMPEZA", "desc": "LIMPA BANHEIRO MULTIUSO SEM CLORO", "forn": "MERCADOLIVRE", "val": 15.48, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "LIMPEZA", "desc": "LIMPA PEDRA", "forn": "MERCADOLIVRE", "val": 38.1, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAFÉ EM GRÃOS", "forn": "MERCADOLIVRE", "val": 268.64, "freq": "MENSAL", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "BENS MATERIAIS", "cat": "MANUTENÇÃO", "subcat": "PEDIDO DE COMPRAS", "desc": "ASSENTO SANITÁRIO", "forn": "MERCADOLIVRE", "val": 56.9, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "BENS MATERIAIS", "cat": "AQUISIÇÃO", "subcat": "PEDIDO DE COMPRAS", "desc": "PRATELEIRA AEREA", "forn": "MERCADOLIVRE", "val": 232.32, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "MATERIAL DE ESCRITORIO", "desc": "PILHA AAA", "forn": "MERCADOLIVRE", "val": 102.0, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "MATERIAL DE ESCRITORIO", "desc": "PILHA AA", "forn": "MERCADOLIVRE", "val": 106.0, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "MATERIAL DE ESCRITORIO", "desc": "ORGANIZADOR DE DOCUMENTOS", "forn": "MERCADOLIVRE", "val": 72.65, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/01/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CESTO PLÁSTICO", "forn": "MERCADOLIVRE", "val": 24.06, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "27/01/2026", "grupo": "TI", "cat": "AQUISIÇÃO", "subcat": "MELHORIA", "desc": "MEMORIA RAM 8GB", "forn": "MERCADOLIVRE", "val": 399.0, "freq": "ÚNICA", "mes_ano": "01/2026", "mes_nome": "Janeiro / 2026"}, {"data": "12/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "LUVA X11 MASCULINA BLACKOU 2", "forn": "MERCADOLIVRE", "val": 113.4, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "12/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "CAPACETE PARA PROTEÇÃO", "forn": "MERCADOLIVRE", "val": 149.06, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "12/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "CAPACETE PARA PROTEÇÃO", "forn": "MERCADOLIVRE", "val": 74.53, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "12/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "CAPACETE PARA PROTEÇÃO", "forn": "MERCADOLIVRE", "val": 74.53, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "12/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "JOELHEIRA + COTOVELEIRA", "forn": "MERCADOLIVRE", "val": 537.0, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "12/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "JOELHEIRA + COTOVELEIRA", "forn": "MERCADOLIVRE", "val": 179.0, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "12/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "COLETE PARA PROTEÇÃO", "forn": "MERCADOLIVRE", "val": 436.04, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "12/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "COLETE PARA PROTEÇÃO", "forn": "MERCADOLIVRE", "val": 872.08, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "PREDIAL", "cat": "AQUISIÇÃO", "subcat": "PEDIDO DE COMPRAS", "desc": "TINTA PARA IMPRESSORA", "forn": "MERCADOLIVRE", "val": 186.99, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "RALO ANTI ESPUMA BANHEIRO", "forn": "MERCADOLIVRE", "val": 61.42, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "LANTERNA CABEÇA", "forn": "MERCADOLIVRE", "val": 23.95, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "AROMATIZADOR DE AMBIENTE", "forn": "MERCADOLIVRE", "val": 205.37, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SBP DE TOMADA", "forn": "GIMBA", "val": 27.45, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "COCA-COLA 2 LITROS | CONSUMO MENSAL", "forn": "GIMBA", "val": 42.16, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SABÃO LIQUIDO", "forn": "GIMBA", "val": 17.45, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "LENÇO UMEDECIDO", "forn": "GIMBA", "val": 24.95, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SACO DE LIXO | CONSUMO MENSAL", "forn": "GIMBA", "val": 29.04, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "AÇUCAR | CONSUMO MENSAL", "forn": "GIMBA", "val": 6.84, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAFÉ EM PÓ | CONSUMO MENSAL", "forn": "GIMBA", "val": 162.41, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CHÁ", "forn": "GIMBA", "val": 1.85, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "FILTRO DE CAFÉ", "forn": "GIMBA", "val": 10.63, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PRATO DESCARTAVEL | CONSUMO MENSAL", "forn": "GIMBA", "val": 3.91, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "COPO DESCARTAVEL | CONSUMO MENSAL", "forn": "GIMBA", "val": 122.36, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "GUARDANAPO | CONSUMO MENSAL", "forn": "GIMBA", "val": 12.41, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "MEXEDOR DE PLASTICO", "forn": "GIMBA", "val": 1.43, "freq": "ÚNICA", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "MATERIAL DE ESCRITORIO", "desc": "FOLHA SULFITE", "forn": "GIMBA", "val": 96.14, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "LIMPEZA", "desc": "DETERGENTE - 5 LITROS | CONSUMO MENSAL", "forn": "GIMBA", "val": 35.24, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "19/02/2026", "grupo": "TI", "cat": "AQUISIÇÃO", "subcat": "EQUIPAMENTOS", "desc": "AQUISIÇÃO DE UM MONITOR LG 27''  - LUANA", "forn": "KABUM", "val": 818.82, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "25/02/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "JOELHEIRA + COTOVELEIRA", "forn": "MERCADOLIVRE", "val": 182.0, "freq": "MENSAL", "mes_ano": "02/2026", "mes_nome": "Fevereiro / 2026"}, {"data": "10/03/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAFÉ EM GRÃOS", "forn": "MERCADOLIVRE", "val": 259.04, "freq": "ÚNICA", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/03/2026", "grupo": "BENS MATERIAIS", "cat": "AQUISIÇÃO", "subcat": "PEDIDO DE COMPRAS", "desc": "PRATELEIRA AEREA", "forn": "MERCADOLIVRE", "val": 234.81, "freq": "ÚNICA", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/03/2026", "grupo": "CORPORATIVO", "cat": "MANUTENÇÃO", "subcat": "EQUIPAMENTOS", "desc": "FILTRO REFIL DE AGUA", "forn": "MERCADOLIVRE", "val": 73.9, "freq": "ÚNICA", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/03/2026", "grupo": "CORPORATIVO", "cat": "MANUTENÇÃO", "subcat": "EQUIPAMENTOS", "desc": "FILTRO REFIL PURIFICADOR", "forn": "MERCADOLIVRE", "val": 55.7, "freq": "ÚNICA", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/03/2026", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "EQUIPAMENTOS", "desc": "GARRAFA TERMICA", "forn": "MERCADOLIVRE", "val": 119.99, "freq": "ÚNICA", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/03/2026", "grupo": "BENS MATERIAIS", "cat": "AQUISIÇÃO", "subcat": "EQUIPAMENTOS", "desc": "CADEIRA DE ESCRITORIO", "forn": "MERCADOLIVRE", "val": 413.0, "freq": "ÚNICA", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/03/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PAPEL HIGIENICO | CONSUMO MENSAL", "forn": "GIMBA", "val": 78.99, "freq": "MENSAL", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/03/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "INTERFOLHA", "forn": "GIMBA", "val": 231.56, "freq": "MENSAL", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/03/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "ESPONJA MULTIUSO | CONSUMO MENSAL", "forn": "GIMBA", "val": 10.9, "freq": "MENSAL", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/03/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SACO DE LIXO | CONSUMO MENSAL", "forn": "GIMBA", "val": 160.39, "freq": "MENSAL", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/03/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAFÉ EM PÓ | CONSUMO MENSAL", "forn": "GIMBA", "val": 197.4, "freq": "MENSAL", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/03/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "COCA-COLA 2 LITROS | CONSUMO MENSAL", "forn": "GIMBA", "val": 89.4, "freq": "MENSAL", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/03/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "FILTRO DE CAFÉ", "forn": "GIMBA", "val": 8.78, "freq": "MENSAL", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "30/03/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "BOTINA DE SEGURANÇA", "forn": "MERCADOLIVRE", "val": 134.91, "freq": "ÚNICA", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "30/03/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "CAMISETA DRY FIT", "forn": "MIRANTE", "val": 101.98, "freq": "ÚNICA", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "30/03/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "CAMISETA DRY FIT", "forn": "MIRANTE", "val": 101.98, "freq": "ÚNICA", "mes_ano": "03/2026", "mes_nome": "Março / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PAPEL HIGIENICO | CONSUMO MENSAL", "forn": "GIMBA", "val": 78.99, "freq": "MENSAL", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "INTERFOLHA", "forn": "GIMBA", "val": 231.56, "freq": "MENSAL", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "FILTRO DE CAFÉ", "forn": "GIMBA", "val": 13.96, "freq": "MENSAL", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "AÇUCAR | CONSUMO MENSAL", "forn": "GIMBA", "val": 23.95, "freq": "MENSAL", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CHÁ", "forn": "GIMBA", "val": 4.39, "freq": "MENSAL", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PRATO DESCARTAVEL | CONSUMO MENSAL", "forn": "GIMBA", "val": 9.9, "freq": "MENSAL", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "DETERGENTE - 5 LITROS | CONSUMO MENSAL", "forn": "GIMBA", "val": 37.8, "freq": "MENSAL", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "LIMPEZA", "desc": "BOM AR | CONSUMO MENSAL", "forn": "GIMBA", "val": 27.98, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "LIMPEZA", "desc": "SABONETE LIQUIDO | CONSUMO MENSAL", "forn": "GIMBA", "val": 33.9, "freq": "MENSAL", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "LIMPEZA", "desc": "LIMPADOR VEJA LIMÃO", "forn": "GIMBA", "val": 32.37, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "LIMPEZA", "desc": "SAPÓLIO CREMOSO", "forn": "GIMBA", "val": 15.98, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SACO DE LIXO | CONSUMO MENSAL", "forn": "GIMBA", "val": 25.98, "freq": "MENSAL", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "COPO DESCARTAVEL | CONSUMO MENSAL", "forn": "GIMBA", "val": 124.9, "freq": "MENSAL", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SBP DE TOMADA", "forn": "GIMBA", "val": 33.59, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "TI", "cat": "AQUISIÇÃO", "subcat": "EQUIPAMENTOS", "desc": "MEMORIA RAM 8GB", "forn": "GIMBA", "val": 426.99, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "COMERCIAL", "cat": "AQUISIÇÃO", "subcat": "EQUIPAMENTOS", "desc": "CAIXA GRANDE C/ TAMPA ORGANIZADORA", "forn": "ARMARINHOS", "val": 41.9, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "LABORATORIO", "desc": "CADEIRA MOCHO PARA OS TECNICOS", "forn": "MERCADOLIVRE", "val": 369.43, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "BENS MATERIAIS", "cat": "MANUTENÇÃO", "subcat": "PEDIDO DE COMPRAS", "desc": "ASSENTO SANITÁRIO", "forn": "MERCADOLIVRE", "val": 37.89, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "REPELENTE PARA INSETOS", "forn": "MERCADOLIVRE", "val": 48.39, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "10/04/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "ODORIZADOR DE AMBIENTE", "forn": "MERCADOLIVRE", "val": 34.99, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "15/04/2026", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "FARMACIA", "desc": "ESPARADRAPO", "forn": "DROGASIL", "val": 12.79, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "15/04/2026", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "FARMACIA", "desc": "GAZES", "forn": "DROGASIL", "val": 4.34, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "15/04/2026", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "FARMACIA", "desc": "ÁGUA BORICADA", "forn": "DROGASIL", "val": 4.79, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "15/04/2026", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "FARMACIA", "desc": "ATADURA DE CREPOM", "forn": "DROGASIL", "val": 5.39, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "15/04/2026", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "FARMACIA", "desc": "MICROPORO", "forn": "DROGASIL", "val": 15.89, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "15/04/2026", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "FARMACIA", "desc": "ÁGUA OXIGENADA", "forn": "DROGASIL", "val": 12.19, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "15/04/2026", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "FARMACIA", "desc": "CAIXA MALETA PARA KIT DE PRIMEIROS SOCORROS", "forn": "DROGASIL", "val": 42.9, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "15/04/2026", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "FARMACIA", "desc": "LUVA DE PROCEDIMENTO", "forn": "DROGASIL", "val": 29.9, "freq": "ÚNICA", "mes_ano": "04/2026", "mes_nome": "Abril / 2026"}, {"data": "06/05/2026", "grupo": "TI", "cat": "AQUISIÇÃO", "subcat": "EQUIPAMENTOS", "desc": "MONITOR LG 26\" - JÉSSICA", "forn": "MERCADOLIVRE", "val": 829.0, "freq": "ÚNICA", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "06/05/2026", "grupo": "BENS MATERIAIS", "cat": "AQUISIÇÃO", "subcat": "EQUIPAMENTOS", "desc": "SUPORTE PARA NOTEBOOK", "forn": "MERCADOLIVRE", "val": 22.9, "freq": "ÚNICA", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "08/05/2026", "grupo": "PREDIAL", "cat": "AQUISIÇÃO", "subcat": "EQUIPAMENTOS", "desc": "EXTINTOR PARA BATERIA DE LÍTIO", "forn": "R & A EXTINTORES", "val": 1599.99, "freq": "ÚNICA", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "PAPEL HIGIENICO | CONSUMO MENSAL", "forn": "GIMBA", "val": 78.99, "freq": "MENSAL", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "INTERFOLHA", "forn": "GIMBA", "val": 405.23, "freq": "MENSAL", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAFÉ EM PÓ | CONSUMO MENSAL", "forn": "GIMBA", "val": 127.6, "freq": "MENSAL", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "ÁLCOOL GEL", "forn": "GIMBA", "val": 6.99, "freq": "MENSAL", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "ÁLCOOL LÍQUIDO", "forn": "GIMBA", "val": 29.18, "freq": "MENSAL", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "AÇUCAR | CONSUMO MENSAL", "forn": "GIMBA", "val": 59.99, "freq": "MENSAL", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "ODORIZADOR DE AMBIENTE", "forn": "GIMBA", "val": 34.98, "freq": "MENSAL", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "ESPONJA MULTIUSO | CONSUMO MENSAL", "forn": "GIMBA", "val": 10.9, "freq": "MENSAL", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SACO DE LIXO | CONSUMO MENSAL", "forn": "GIMBA", "val": 79.9, "freq": "MENSAL", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "COCA-COLA 2 LITROS | CONSUMO MENSAL", "forn": "GIMBA", "val": 89.4, "freq": "MENSAL", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SBP DE TOMADA", "forn": "GIMBA", "val": 18.9, "freq": "ÚNICA", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "FILTRO REFIL DE AGUA", "forn": "MERCADOLIVRE", "val": 70.21, "freq": "ÚNICA", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "MATERIAL DE ESCRITORIO", "desc": "PILHAS RECARREGAVEIS AA", "forn": "MERCADOLIVRE", "val": 107.0, "freq": "ÚNICA", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "TI", "cat": "AQUISIÇÃO", "subcat": "ACESSORIOS", "desc": "CAPINHA SILICONE IPHONE 7", "forn": "MERCADOLIVRE", "val": 19.6, "freq": "ÚNICA", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "11/05/2026", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "LABORATORIO", "desc": "CADEIRA MOCHO PARA OS TECNICOS", "forn": "MERCADOLIVRE", "val": 399.98, "freq": "ÚNICA", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "19/05/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "MATERIAL DE ESCRITORIO", "desc": "PILHA CR123A SONY", "forn": "MERCADOLIVRE", "val": 34.5, "freq": "ÚNICA", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "01/06/2026", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "LABORATORIO", "desc": "CADEIRA MOCHO PARA OS TECNICOS", "forn": "MERCADOLIVRE", "val": 350.95, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "01/06/2026", "grupo": "TI", "cat": "MANUTENÇÃO", "subcat": "EQUIPAMENTOS", "desc": "CONSERTO DE CELULAR - OCTAVIO", "forn": "LOJA FISICA", "val": 300.0, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "COMERCIAL", "cat": "MARKETING", "subcat": "DECORAÇÃO", "desc": "ENVELOPAMENTO DO FRIGOBAR", "forn": "LOJA FISICA", "val": 460.0, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "08/06/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "CAMISA SOCIAL AZUL", "forn": "FASCYNIOS", "val": 189.0, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "08/06/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "CAMISA SOCIAL BRANCA", "forn": "FASCYNIOS", "val": 378.0, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "DETERGENTE - 5 LITROS | CONSUMO MENSAL", "forn": "GIMBA", "val": 31.78, "freq": "MENSAL", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "-", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SACO DE LIXO | CONSUMO MENSAL", "forn": "GIMBA", "val": 115.98, "freq": "MENSAL", "mes_ano": "05/2026", "mes_nome": "Maio / 2026"}, {"data": "-", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "INTERFOLHA", "forn": "GIMBA", "val": 231.56, "freq": "MENSAL", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "BENS MATERIAIS", "cat": "AQUISIÇÃO", "subcat": "EQUIPAMENTOS", "desc": "LIXEIRA 15L", "forn": "GIMBA", "val": 26.99, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "DESENTUPIDOR", "forn": "GIMBA", "val": 5.9, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAFÉ EM PÓ | CONSUMO MENSAL", "forn": "SPANI", "val": 183.2, "freq": "MENSAL", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "COCA-COLA 2 LITROS | CONSUMO MENSAL", "forn": "SPANI", "val": 32.7, "freq": "MENSAL", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "AÇUCAR | CONSUMO MENSAL", "forn": "SPANI", "val": 13.95, "freq": "MENSAL", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "SACO DE LIXO | CONSUMO MENSAL", "forn": "ARMARINHOS", "val": 12.6, "freq": "MENSAL", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "LENÇO UMEDECIDO", "forn": "ARMARINHOS", "val": 23.94, "freq": "MENSAL", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "ESCORREDOR", "forn": "ARMARINHOS", "val": 25.99, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "CORPORATIVO", "cat": "AQUISIÇÃO", "subcat": "LABORATORIO", "desc": "CADEIRA MOCHO PARA OS TECNICOS", "forn": "MERCADOLIVRE", "val": 701.9, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "COMERCIAL", "cat": "MARKETING", "subcat": "COMES E BEBES", "desc": "COPOS DE ISOPOR", "forn": "MANOS DOCES", "val": 12.4, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "COMERCIAL", "cat": "MARKETING", "subcat": "COMES E BEBES", "desc": "ÁGUA MINERAL", "forn": "MANOS DOCES", "val": 48.0, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "COMERCIAL", "cat": "MARKETING", "subcat": "COMES E BEBES", "desc": "SUCO INTEGRAL", "forn": "MANOS DOCES", "val": 93.36, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "COMERCIAL", "cat": "MARKETING", "subcat": "COMES E BEBES", "desc": "AMENDOIM JAPONES", "forn": "MANOS DOCES", "val": 16.68, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "COMERCIAL", "cat": "MARKETING", "subcat": "COMES E BEBES", "desc": "AMENDOIM OVINHOS", "forn": "MANOS DOCES", "val": 20.52, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "-", "grupo": "COMERCIAL", "cat": "MARKETING", "subcat": "COMES E BEBES", "desc": "CAPSULA DE CAFÉ", "forn": "MANOS DOCES", "val": 84.9, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "19/06/2026", "grupo": "CORPORATIVO", "cat": "MATERIAIS DE CONSUMO", "subcat": "PEDIDO DE COMPRAS", "desc": "CAIXA GRANDE C/ TAMPA ORGANIZADORA", "forn": "ARMARINHOS", "val": 41.9, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "23/06/2026", "grupo": "TI", "cat": "AQUISIÇÃO", "subcat": "EQUIPAMENTOS", "desc": "MEMORIA RAM 8GB", "forn": "MERCADOLIVRE", "val": 445.0, "freq": "ÚNICA", "mes_ano": "06/2026", "mes_nome": "Junho / 2026"}, {"data": "01/07/2026", "grupo": "PREDIAL", "cat": "SEGURO", "subcat": "RENOVAÇÃO", "desc": "RENOVAÇÃO DO SEGURO FIANÇA", "forn": "PORTO SEGURO", "val": 634.17, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "LENÇO UMEDECIDO", "forn": "ARMARINHOS", "val": 11.0, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "GUARDANAPO | CONSUMO MENSAL", "forn": "ARMARINHOS", "val": 4.8, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "ÁLCOOL LÍQUIDO", "forn": "ARMARINHOS", "val": 9.98, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "PRATO DESCARTAVEL | CONSUMO MENSAL", "forn": "ARMARINHOS", "val": 6.0, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "COPO DESCARTAVEL | CONSUMO MENSAL", "forn": "ARMARINHOS", "val": 130.0, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "DETERGENTE - 5 LITROS | CONSUMO MENSAL", "forn": "ASSAI", "val": 53.97, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "COCA-COLA 2 LITROS | CONSUMO MENSAL", "forn": "ASSAI", "val": 20.38, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "SBPSPRAY", "forn": "ASSAI", "val": 12.49, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "SABONETE LIQUIDO | CONSUMO MENSAL", "forn": "ASSAI", "val": 25.29, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "CHÁ", "forn": "ASSAI", "val": 3.9, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "SAPÓLIO CREMOSO", "forn": "ASSAI", "val": 7.39, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "ACENDEDOR TUPI 80", "forn": "ASSAI", "val": 7.9, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "LIMPADOR VEJA GOLD", "forn": "-", "val": 4.59, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "DESINFETANTE", "forn": "ASSAI", "val": 12.49, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "ÁGUA SÁNITARIA", "forn": "ASSAI", "val": 9.99, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "INTERFOLHA", "forn": "COMERCIAL AVILLA", "val": 896.0, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "FOLHA SULFITE", "forn": "ARMARINHOS", "val": 47.98, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "FONE DE OUVIDO P2", "forn": "ARMARINHOS", "val": 19.5, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "CORPORATIVO", "cat": "ENDOMARKETING", "subcat": "FESTA JUNINA", "desc": "PEDIDO DE COMPRAS PARA ALIMENTOS E INSUMOS PARA REALIZAR O EVENTO", "forn": "MERCADO", "val": 803.7, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "09/07/2026", "grupo": "COMERCIAL", "cat": "PEDIDO DE COMPRAS", "subcat": "FEIRAS E EVENTOS", "desc": "INSUMOS, ALIMENTOS E BRINDES PARA PARTICIPAÇÃO DE FEIRAS", "forn": "MERCADO", "val": 291.02, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "16/07/2026", "grupo": "FROTA", "cat": "MANUTENÇÃO", "subcat": "BORRACHARIA", "desc": "CONCERTO INTERNO DE UM DOS PNEUS DA FIORINO", "forn": "BORRACHARIA DO GAUCHO", "val": 60.0, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "20/07/2026", "grupo": "FROTA", "cat": "MANUTENÇÃO", "subcat": "PREVENTIVA", "desc": "FOI REALIZADO A TROCA DE OLEO E DE LAMPADAS QUEIMADAS", "forn": "MERCADOCAR", "val": 307.23, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "22/07/2026", "grupo": "PREDIAL", "cat": "MANUTENÇÃO", "subcat": "EXTINTORES", "desc": "FOI REALIZADO A TROCA DE EXTINTORES", "forn": "WTLFIRE", "val": 340.0, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "24/07/2026", "grupo": "FROTA", "cat": "INFRAÇÕES", "subcat": "MULTAS", "desc": "MULTA EM ATRASO DO MÊS DE JANEIRO", "forn": "DETRAN SP", "val": 895.63, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "29/07/2026", "grupo": "CORPORATIVO", "cat": "ENDOMARKETING", "subcat": "FESTA JUNINA", "desc": "COMPRA DE SALGADINHOS", "forn": "IFOOD", "val": 277.98, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "29/07/2026", "grupo": "CORPORATIVO", "cat": "ENDOMARKETING", "subcat": "FESTA JUNINA", "desc": "PÃES E GELO COMPRADO PARA A FESTA JUNINA", "forn": "BETH MANIA", "val": 38.03, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "29/07/2026", "grupo": "CORPORATIVO", "cat": "ENDOMARKETING", "subcat": "CONSUMOS", "desc": "CONSUMO DE PÃES", "forn": "BETH MANIA", "val": 472.57, "freq": "MENSAL", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "30/07/2026", "grupo": "PREDIAL", "cat": "SEGURANÇA", "subcat": "CHAVES", "desc": "FOI EMITIDA 9 CÓPIAS DE CHAVES", "forn": "SUKA CHAVEIRO", "val": 135.0, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "30/07/2026", "grupo": "PREDIAL", "cat": "SEGURANÇA", "subcat": "ALARMES", "desc": "CONTRATAÇÃO DE UM PRESTADOR DE SERVIÇOS AUTORIZADO DA INTELBRAS PARA CONFIGURAÇÃO DE ALARMES", "forn": "STS ALARMES", "val": 295.0, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "30/07/2026", "grupo": "PREDIAL", "cat": "SEGURANÇA", "subcat": "FECHADURA", "desc": "FOI REALIZADO A TROCA DA FECHADURA ELETRONICA E A REPOSIÇÃO DO INTERFONE", "forn": "EDUARDO GUERRERO", "val": 1220.0, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "31/07/2026", "grupo": "CORPORATIVO", "cat": "ENDOMARKETING", "subcat": "FESTA JUNINA", "desc": "REALIZADO A COMPRA DE VOUCHER PARA RESTAURANTE | PRÊMIO PARA FESTA JUNINA", "forn": "COCO BAMBU", "val": 200.0, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "31/07/2026", "grupo": "CORPORATIVO", "cat": "ENDOMARKETING", "subcat": "FESTA JUNINA", "desc": "REALIZADO A COMPRA DE VOUCHER PARA GAMES | PRÊMIO PARA FESTA JUNINA", "forn": "PLAYSTATION", "val": 200.0, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "31/07/2026", "grupo": "CORPORATIVO", "cat": "ENDOMARKETING", "subcat": "FESTA JUNINA", "desc": "REALIZADO A COMPRA DE VOUCHER PARA MASSAGEM | PRÊMIO PARA FESTA JUNINA", "forn": "BUDDHA SPA", "val": 250.0, "freq": "ÚNICA", "mes_ano": "07/2026", "mes_nome": "Julho / 2026"}, {"data": "04/08/2026", "grupo": "PREDIAL", "cat": "LIMPEZA", "subcat": "TERCEIRIZADOS", "desc": "CONTRATAÇÃO DA LARISSA SERVICE", "forn": "LARISSA SERVICE", "val": 3350.0, "freq": "MENSAL", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "04/08/2026", "grupo": "CORPORATIVO", "cat": "ENDOMARKETING", "subcat": "ANIVERSARIANTES", "desc": "COMPRA DO BOLO PARA ANIVERSARIANTES", "forn": "GF CONFEITARIA", "val": 210.0, "freq": "MENSAL", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "05/08/2026", "grupo": "PREDIAL", "cat": "MANUTENÇÃO", "subcat": "LABORATORIO", "desc": "COMPRA DE PISTÃO PARA TROCA DOS ELEVADORES USADOS PARA DICICLOS", "forn": "GRUPO OVD", "val": 164.47, "freq": "ÚNICA", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "06/08/2026", "grupo": "COMERCIAL", "cat": "MATERIAIS PROMOCIONAIS", "subcat": "FOLHETO E CARTÕES DE VISITA", "desc": "REALIZADO A COMPRA DE FOLHETOS PARA PARTICIPAÇÃO DA FEIRA COP", "forn": "3TORRES", "val": 2031.9, "freq": "ÚNICA", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "10/08/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "MATERIAIS DE CONSUMO", "desc": "ITENS DE INSUMOS QUE PRECISAM DE REPOSIÇÃO MENSAL ASSIM COMO ITENS PARA MELHORIAS", "forn": "-", "val": 1258.88, "freq": "MENSAL", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "10/08/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "PROTEÇÕES E UNIFORMES", "desc": "COMPRA DE ROUPAS PROFISSIONAIS E DE MATERIAS DE PROTEÇÃO", "forn": "-", "val": 882.56, "freq": "ÚNICA", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "10/08/2026", "grupo": "CORPORATIVO", "cat": "PEDIDO DE COMPRAS", "subcat": "KIT DE PRIMEIROS SOCORROS", "desc": "COMPRA DE INSUMOS PARA COMPOR O KIT DE PRIMEIROS SOCORROS", "forn": "PAGUEMENOS", "val": 85.13, "freq": "ÚNICA", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "17/08/2026", "grupo": "TI", "cat": "AQUISIÇÃO", "subcat": "EXTINTORES", "desc": "AQUISIÇÃO DE UM MONITOR A PEDIDO DA JESSICA", "forn": "MERCADOLIVRE", "val": 662.0, "freq": "ÚNICA", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "17/08/2026", "grupo": "BENS MATERIAIS", "cat": "AQUISIÇÃO", "subcat": "MOVEIS", "desc": "AQUISIÇÃO DE SUPORTE PARA MONITOR A PEDIDO DA JESSICA", "forn": "MERCADOLIVRE", "val": 54.91, "freq": "ÚNICA", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "19/08/2026", "grupo": "COMERCIAL", "cat": "UNIFORME", "subcat": "AQUISIÇÃO", "desc": "COMPRA DE CAMSIA SOCIAL PARA LUANA", "forn": "FASCYNIOS", "val": 189.0, "freq": "ÚNICA", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "19/08/2026", "grupo": "COMERCIAL", "cat": "UNIFORME", "subcat": "BORDADO", "desc": "CAMISA SOCIAL BORDADO COM A LOGO BRMOBILITY", "forn": "TATO SERVIÇOS", "val": 30.0, "freq": "ÚNICA", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "19/08/2026", "grupo": "CORPORATIVO", "cat": "LAUDOS E CERTIFICADOS", "subcat": "LAUDO ERGONOMICO", "desc": "ATUALIZAÇÃO DO LAUDO ERGONOMICO PARA DICICLOS", "forn": "POSTURE", "val": 600.0, "freq": "ÚNICA", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "19/08/2026", "grupo": "FROTA", "cat": "MANUTENÇÃO", "subcat": "SISTEMA DE FREIOS", "desc": "FOI FEITO A MANUTENÇÃO NO SISTEMA DE FREIOS DA FIORINO", "forn": "ISA AUTO CENTER", "val": 627.0, "freq": "ÚNICA", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "24/08/2026", "grupo": "CORPORATIVO", "cat": "ENDOMARKETING", "subcat": "ANIVERSARIANTES", "desc": "COMPRA DO BOLO PARA ANIVERSARIANTES", "forn": "GF CONFEITARIA", "val": 210.0, "freq": "MENSAL", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}, {"data": "24/08/2026", "grupo": "PREDIAL", "cat": "MANUTENÇÃO", "subcat": "LABORATORIO", "desc": "INSTALAÇÃO DE FILTRO DE PRESSÃO DE AR", "forn": "GP COMPRESSORES", "val": 1020.0, "freq": "ÚNICA", "mes_ano": "08/2026", "mes_nome": "Agosto / 2026"}];
+
+        const groupColors = {
+            'PREDIAL': '#1f497d',
+            'CORPORATIVO': '#2563eb',
+            'COMERCIAL': '#3b82f6',
+            'FROTA': '#60a5fa',
+            'TI': '#93c5fd',
+            'BENS MATERIAIS': '#cbd5e1'
         };
 
-        const weekDaysList = [
-            { key: 'segunda', label: 'Seg' },
-            { key: 'terca', label: 'Ter' },
-            { key: 'quarta', label: 'Qua' },
-            { key: 'quinta', label: 'Qui' },
-            { key: 'sexta', label: 'Sex' },
-            { key: 'sabado', label: 'Sab' },
-            { key: 'domingo', label: 'Dom' }
-        ];
+        let currentFilteredData = [...allData];
+        let currentGroupFilter = 'ALL';
+        let myChart = null;
 
-        const dayFullNames = {
-            segunda: 'Segunda-Feira',
-            terca: 'Terça-Feira',
-            quarta: 'Quarta-Feira',
-            quinta: 'Quinta-Feira',
-            sexta: 'Sexta-Feira',
-            sabado: 'Sábado',
-            domingo: 'Domingo'
-        };
+        function fmtBRL(v) {
+            return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
 
-        const rosaryData = {
-            segunda: {
-                title: "Mistérios Gozosos",
-                items: [
-                    "1. A Anunciação do Anjo Gabriel a Maria.",
-                    "2. A Visitação de Maria a Santa Isabel.",
-                    "3. O Nascimento de Jesus em Belém.",
-                    "4. A Apresentação do Menino Jesus no Templo.",
-                    "5. O Encontro do Menino Jesus entre os Doutores da Lei."
-                ]
-            },
-            terca: {
-                title: "Mistérios Dolorosos",
-                items: [
-                    "1. A Agonia de Jesus no Horto das Oliveiras.",
-                    "2. A Flagelação de Jesus.",
-                    "3. A Coroação de Espinhos.",
-                    "4. Jesus carrega a Cruz até o Calvário.",
-                    "5. A Crucificação e Morte de Jesus."
-                ]
-            },
-            quarta: {
-                title: "Mistérios Gloriosos",
-                items: [
-                    "1. A Ressurreição de Jesus.",
-                    "2. A Ascensão de Jesus ao Céu.",
-                    "3. A Vinda do Espírito Santo em Pentecostes.",
-                    "4. A Assunção de Maria ao Céu.",
-                    "5. A Coroação de Maria como Rainha do Céu e da Terra."
-                ]
-            },
-            quinta: {
-                title: "Mistérios Luminosos",
-                items: [
-                    "1. O Batismo de Jesus no Rio Jordão.",
-                    "2. A Auto-revelação de Jesus nas Bodas de Caná.",
-                    "3. O Anúncio do Reino de Deus e o Convite à Conversão.",
-                    "4. A Transfiguração de Jesus no Monte Tabor.",
-                    "5. A Instituição da Eucaristia na Última Ceia."
-                ]
-            },
-            sexta: {
-                title: "Mistérios Dolorosos",
-                items: [
-                    "1. A Agonia de Jesus no Horto das Oliveiras.",
-                    "2. A Flagelação de Jesus.",
-                    "3. A Coroação de Espinhos.",
-                    "4. Jesus carrega a Cruz até o Calvário.",
-                    "5. A Crucificação e Morte de Jesus."
-                ]
-            },
-            sabado: {
-                title: "Mistérios Gozosos",
-                items: [
-                    "1. A Anunciação do Anjo Gabriel a Maria.",
-                    "2. A Visitação de Maria a Santa Isabel.",
-                    "3. O Nascimento de Jesus em Belém.",
-                    "4. A Apresentação do Menino Jesus no Templo.",
-                    "5. O Encontro do Menino Jesus entre os Doutores da Lei."
-                ]
-            },
-            domingo: {
-                title: "Mistérios Gloriosos",
-                items: [
-                    "1. A Ressurreição de Jesus.",
-                    "2. A Ascensão de Jesus ao Céu.",
-                    "3. A Vinda do Espírito Santo em Pentecostes.",
-                    "4. A Assunção de Maria ao Céu.",
-                    "5. A Coroação de Maria como Rainha do Céu e da Terra."
-                ]
+        function onMonthChange() {
+            const selectedMonth = document.getElementById('monthSelect').value;
+            if (selectedMonth === 'ALL') {
+                currentFilteredData = [...allData];
+            } else {
+                currentFilteredData = allData.filter(r => r.mes_ano === selectedMonth);
             }
-        };
+            updateDashboard();
+        }
 
-        const financeMonthsList = [
-            { key: 'jan', label: 'Jan' }, { key: 'fev', label: 'Fev' }, { key: 'mar', label: 'Mar' },
-            { key: 'abr', label: 'Abr' }, { key: 'mai', label: 'Mai' }, { key: 'jun', label: 'Jun' },
-            { key: 'jul', label: 'Jul' }, { key: 'ago', label: 'Ago' }, { key: 'set', label: 'Set' },
-            { key: 'out', label: 'Out' }, { key: 'nov', label: 'Nov' }, { key: 'dez', label: 'Dez' }
-        ];
+        function updateDashboard() {
+            updateKPIs();
+            renderChart();
+            buildDrillTable();
+            renderFullTable();
+        }
 
-        const financeItems = ['Aluguel', 'Enel', 'Tim', 'Vivo', 'Comgás', 'Flávia', 'Nubank', 'Itaú'];
+        function updateKPIs() {
+            const total = currentFilteredData.reduce((acc, r) => acc + r.val, 0);
+            const count = currentFilteredData.length;
+            const avg = count > 0 ? total / count : 0;
 
-        const defaultTasksMap = {
-            segunda: [
-                { id: 'terco', text: 'Rezar o Terço (Mistérios Gozosos)' },
-                { id: 'water', text: 'Meta de Água (3000ml)' },
-                { id: 'pre', text: 'Refeição: Pré-treino' },
-                { id: 'workout', text: 'Treino: Glúteo Máximo & Posterior' },
-                { id: 'cafe', text: 'Refeição: Café da Manhã' },
-                { id: 'almoco', text: 'Refeição: Almoço' },
-                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
-                { id: 'jantar', text: 'Refeição: Jantar' }
-            ],
-            terca: [
-                { id: 'terco', text: 'Rezar o Terço (Mistérios Dolorosos)' },
-                { id: 'water', text: 'Meta de Água (3000ml)' },
-                { id: 'pre', text: 'Refeição: Pré-treino' },
-                { id: 'workout', text: 'Treino: Costas • Bíceps • Ombros' },
-                { id: 'cafe', text: 'Refeição: Café da Manhã' },
-                { id: 'almoco', text: 'Refeição: Almoço' },
-                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
-                { id: 'jantar', text: 'Refeição: Jantar' }
-            ],
-            quarta: [
-                { id: 'terco', text: 'Rezar o Terço (Mistérios Gloriosos)' },
-                { id: 'water', text: 'Meta de Água (3000ml)' },
-                { id: 'pre', text: 'Refeição: Pré-treino' },
-                { id: 'workout', text: 'Treino: Quadríceps & Glúteo Médio' },
-                { id: 'cafe', text: 'Refeição: Café da Manhã' },
-                { id: 'almoco', text: 'Refeição: Almoço' },
-                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
-                { id: 'jantar', text: 'Refeição: Jantar' }
-            ],
-            quinta: [
-                { id: 'terco', text: 'Rezar o Terço (Mistérios Luminosos)' },
-                { id: 'water', text: 'Meta de Água (3000ml)' },
-                { id: 'pre', text: 'Refeição: Pré-treino' },
-                { id: 'workout', text: 'Treino: Costas • Braços • Core' },
-                { id: 'cafe', text: 'Refeição: Café da Manhã' },
-                { id: 'almoco', text: 'Refeição: Almoço' },
-                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
-                { id: 'jantar', text: 'Refeição: Jantar' }
-            ],
-            sexta: [
-                { id: 'terco', text: 'Rezar o Terço (Mistérios Dolorosos)' },
-                { id: 'water', text: 'Meta de Água (3000ml)' },
-                { id: 'pre', text: 'Refeição: Pré-treino' },
-                { id: 'workout', text: 'Descanso Ativo & Mobilidade' },
-                { id: 'cafe', text: 'Refeição: Café da Manhã' },
-                { id: 'almoco', text: 'Refeição: Almoço' },
-                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
-                { id: 'jantar', text: 'Refeição: Jantar' }
-            ],
-            sabado: [
-                { id: 'terco', text: 'Rezar o Terço (Mistérios Gozosos)' },
-                { id: 'water', text: 'Meta de Água (3000ml)' },
-                { id: 'pre', text: 'Refeição: Pré-treino' },
-                { id: 'workout', text: 'Treino: Glúteo Pump' },
-                { id: 'cafe', text: 'Refeição: Café da Manhã' },
-                { id: 'almoco', text: 'Refeição: Almoço' },
-                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
-                { id: 'jantar', text: 'Refeição: Jantar' }
-            ],
-            domingo: [
-                { id: 'terco', text: 'Rezar o Terço (Mistérios Gloriosos)' },
-                { id: 'water', text: 'Meta de Água (3000ml)' },
-                { id: 'pre', text: 'Refeição: Pré-treino' },
-                { id: 'workout', text: 'Descanso Total & Recuperação' },
-                { id: 'cafe', text: 'Refeição: Café da Manhã' },
-                { id: 'almoco', text: 'Refeição: Almoço' },
-                { id: 'lanche', text: 'Refeição: Lanche da Tarde' },
-                { id: 'jantar', text: 'Refeição: Jantar' }
-            ]
-        };
+            document.getElementById('kpi-total').innerText = fmtBRL(total);
+            document.getElementById('kpi-count').innerText = count + ' itens';
+            document.getElementById('kpi-avg').innerText = fmtBRL(avg);
 
-        const workoutsData = {
-            segunda: { title: "Glúteo Máximo & Posterior", desc: "Foco em Força e Carga • 55–65 min", items: ["Elevação Pélvica (Barra/Máq) - 4x8–12 (2s topo)", "Agachamento Búlgaro - 3x10–12", "Bom Dia / Good Morning - 4x10–12", "Cadeira Flexora - 4x12–15", "Glúteo Caneleira/Polia - 3x12–15"] },
-            terca: { title: "Costas • Bíceps • Ombros", desc: "Definição do Tronco + Cardio", items: ["Puxada Alta Aberta - 4x10–12", "Remada Baixa Triângulo - 3x12", "Desenvolvimento Halteres - 3x12", "Elevação Lateral - 4x12–15", "Rosca Bíceps - 4x12–15", "Cardio: 25–30 min"] },
-            quarta: { title: "Quadríceps & Glúteo Médio", desc: "Foco em Pernas e Lateral do Glúteo", items: ["Agachamento Halter (Goblet) - 4x10–12", "Leg Press 45° - 3x10–12", "Cadeira Extensora - 3x12–15", "Cadeira Abdutora - 4x15–20", "Abdução no Cabo - 3x12–15", "Cardio Bike: 25–30 min"] },
-            quinta: { title: "Costas • Braços • Core", desc: "Escultura de Tronco e Abdômen", items: ["Puxada Triângulo - 4x10–12", "Remada Unilateral (Serrote) - 3x12", "Face Pull com Corda - 3x15", "Tríceps Pulley + Rosca Direta - 3x12", "Prancha Abdominal - 3x45–60s", "Abdominal Infra - 3x15–20", "Cardio: 25–30 min"] },
-            sexta: { title: "Descanso Ativo & Recuperação", desc: "Recuperação Muscular Direcionada", items: ["Alongamentos Leves", "Mobilidade de Quadril", "Hidratação Adicional", "Sono reparador"] },
-            sabado: { title: "Glúteo Pump & Posterior", desc: "Modelagem e Exaustão Muscular", items: ["Elevação Pélvica Unilateral - 3x12", "Levantamento Terra Sumô - 4x10", "Passada Caminhando - 3x20 passos", "Cadeira Flexora - 3x12–15", "Cadeira Abdutora - 3x20 (Dropset)"] },
-            domingo: { title: "Descanso Total & Planejamento", desc: "Preparação para a Próxima Semana", items: ["Resumo semanal de conquistas", "Organização do Meal Prep / Marmitas", "Relaxamento e Descanso"] }
-        };
+            // Calculate top group
+            const grpMap = {};
+            currentFilteredData.forEach(r => {
+                grpMap[r.grupo] = (grpMap[r.grupo] || 0) + r.val;
+            });
 
-        let draggedIndex = null;
+            let topGrp = '-';
+            let maxVal = 0;
+            for (const g in grpMap) {
+                if (grpMap[g] > maxVal) {
+                    maxVal = grpMap[g];
+                    topGrp = g;
+                }
+            }
 
-        const app = {
-            init() {
-                this.loadDB();
-                this.updateDateHeader();
-                this.nav('dashboard');
-            },
+            const topPct = total > 0 ? ((maxVal / total) * 100).toFixed(1) : 0;
+            document.getElementById('kpi-top').innerText = topGrp !== '-' ? `${topGrp} (${topPct}%)` : '-';
+        }
 
-            loadDB() {
-                const saved = localStorage.getItem('van_fitness_db');
-                if (saved) Object.assign(DB, JSON.parse(saved));
-                DB.water.target = 3000;
-            },
+        function renderChart() {
+            const ctx = document.getElementById('costChart').getContext('2d');
+            const total = currentFilteredData.reduce((acc, r) => acc + r.val, 0);
 
-            saveDB() {
-                localStorage.setItem('van_fitness_db', JSON.stringify(DB));
-            },
+            const grpMap = {};
+            currentFilteredData.forEach(r => {
+                grpMap[r.grupo] = (grpMap[r.grupo] || 0) + r.val;
+            });
 
-            toast(msg) {
-                const t = document.getElementById('toast');
-                t.innerText = msg;
-                t.style.display = 'block';
-                setTimeout(() => t.style.display = 'none', 2200);
-            },
+            const labels = Object.keys(grpMap);
+            const values = Object.values(grpMap);
+            const bgColors = labels.map(l => groupColors[l] || '#94a3b8');
 
-            updateDateHeader() {
-                document.getElementById('current-date-title').innerText = dayFullNames[DB.selectedDayKey];
-            },
+            if (myChart) {
+                myChart.destroy();
+            }
 
-            nav(screen) {
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                const btnMap = { dashboard: 0, alimentacao: 1, treinos: 2, agua: 3, espiritual: 4, financeiro: 5, perfil: 6 };
-                if (btnMap[screen] !== undefined) document.querySelectorAll('.nav-item')[btnMap[screen]].classList.add('active');
-
-                const vp = document.getElementById('app-viewport');
-                vp.innerHTML = `<div class="view-screen">${this.screens[screen]()}</div>`;
-            },
-
-            selectWeekDay(dayKey) {
-                DB.selectedDayKey = dayKey;
-                this.saveDB();
-                this.updateDateHeader();
-                this.nav('dashboard');
-            },
-
-            toggleDailyTask(taskId) {
-                const key = `day_${DB.selectedDayKey}_${taskId}`;
-                DB.checklistState[key] = !DB.checklistState[key];
-                this.saveDB();
-                this.nav('dashboard');
-            },
-
-            initTouchReorder() {
-                const container = document.getElementById('checklist-container');
-                if (!container) return;
-
-                let activeItem = null;
-
-                const items = container.querySelectorAll('.check-item');
-                items.forEach((item, index) => {
-                    item.addEventListener('touchstart', (e) => {
-                        activeItem = item;
-                        draggedIndex = index;
-                        item.classList.add('dragging');
-                    }, { passive: true });
-
-                    item.addEventListener('touchmove', (e) => {
-                        if (!activeItem) return;
-                        const currentY = e.touches[0].clientY;
-                        const targetElement = document.elementFromPoint(e.touches[0].clientX, currentY);
-                        const targetItem = targetElement ? targetElement.closest('.check-item') : null;
-
-                        if (targetItem && targetItem !== activeItem) {
-                            const targetIndex = parseInt(targetItem.getAttribute('data-index'));
-                            if (!isNaN(targetIndex) && targetIndex !== draggedIndex) {
-                                const tasks = app.getDailyTasks(DB.selectedDayKey);
-                                const draggedTask = tasks[draggedIndex];
-                                tasks.splice(draggedIndex, 1);
-                                tasks.splice(targetIndex, 0, draggedTask);
-                                DB.customTasksOrder[DB.selectedDayKey] = tasks;
-                                app.saveDB();
-                                draggedIndex = targetIndex;
-                                app.nav('dashboard');
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: bgColors,
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    const val = ctx.raw;
+                                    const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                                    return ` ${ctx.label}: ${fmtBRL(val)} (${pct}%)`;
+                                }
                             }
                         }
-                    }, { passive: true });
-
-                    item.addEventListener('touchend', () => {
-                        if (activeItem) {
-                            activeItem.classList.remove('dragging');
-                            activeItem = null;
-                            draggedIndex = null;
-                        }
-                    });
-                });
-            },
-
-            handleDragStart(e, index) {
-                draggedIndex = index;
-                e.currentTarget.classList.add('dragging');
-            },
-
-            handleDragOver(e) {
-                e.preventDefault();
-            },
-
-            handleDrop(e, targetIndex) {
-                e.preventDefault();
-                if (draggedIndex === null || draggedIndex === targetIndex) return;
-
-                const tasks = this.getDailyTasks(DB.selectedDayKey);
-                const draggedItem = tasks[draggedIndex];
-                
-                tasks.splice(draggedIndex, 1);
-                tasks.splice(targetIndex, 0, draggedItem);
-
-                DB.customTasksOrder[DB.selectedDayKey] = tasks;
-                this.saveDB();
-                draggedIndex = null;
-                this.nav('dashboard');
-            },
-
-            handleDragEnd(e) {
-                e.currentTarget.classList.remove('dragging');
-                draggedIndex = null;
-            },
-
-            toggleExercise(dayKey, index) {
-                const key = `${dayKey}_ex_${index}`;
-                DB.workoutProgress[key] = !DB.workoutProgress[key];
-                this.saveDB();
-                this.nav('treinos');
-            },
-
-            addWater(amount) {
-                DB.water.current = Math.max(0, Math.min(DB.water.target, DB.water.current + amount));
-                this.saveDB();
-                this.toast(amount >= 0 ? `+${amount}ml registrados! 💧` : `${amount}ml ajustados! 💧`);
-                this.nav('agua');
-            },
-
-            resetWater() {
-                DB.water.current = 0;
-                this.saveDB();
-                this.toast('Registro de água zerado! 💧');
-                this.nav('agua');
-            },
-
-            setNutriTab(tab) {
-                DB.selectedNutriTab = tab;
-                this.nav('alimentacao');
-            },
-
-            setWorkoutDay(day) {
-                DB.selectedWorkoutDay = day;
-                this.nav('treinos');
-            },
-
-            setFinanceMonth(monthKey) {
-                DB.selectedFinanceMonth = monthKey;
-                this.saveDB();
-                this.nav('financeiro');
-            },
-
-            setRosaryDay(dayKey) {
-                DB.selectedRosaryDay = dayKey;
-                this.saveDB();
-                this.nav('espiritual');
-            },
-
-            toggleFinanceItem(item) {
-                const key = `fin_${DB.selectedFinanceMonth}_${item}`;
-                DB.financeState[key] = !DB.financeState[key];
-                this.saveDB();
-                this.nav('financeiro');
-            },
-
-            getDailyTasks(dayKey) {
-                if (DB.customTasksOrder[dayKey] && DB.customTasksOrder[dayKey].length > 0) {
-                    return DB.customTasksOrder[dayKey];
+                    }
                 }
-                return [...defaultTasksMap[dayKey]];
-            },
+            });
+        }
 
-            screens: {
-                dashboard() {
-                    const tasks = app.getDailyTasks(DB.selectedDayKey);
-                    let completed = 0;
-                    tasks.forEach(t => {
-                        const key = `day_${DB.selectedDayKey}_${t.id}`;
-                        if (DB.checklistState[key]) completed++;
-                    });
-                    const pct = Math.round((completed / tasks.length) * 100);
+        function buildDrillTable() {
+            const tbody = document.getElementById('drillBody');
+            tbody.innerHTML = '';
 
-                    const calHTML = weekDaysList.map(item => {
-                        const isActive = item.key === DB.selectedDayKey ? 'active' : '';
-                        return `
-                            <div class="day-card ${isActive}" onclick="app.selectWeekDay('${item.key}')">
-                                <div class="day-name">${item.label}</div>
-                            </div>
+            const total = currentFilteredData.reduce((acc, r) => acc + r.val, 0);
+
+            const hierarchy = {};
+            currentFilteredData.forEach(r => {
+                if (!hierarchy[r.grupo]) hierarchy[r.grupo] = { total: 0, cats: {} };
+                hierarchy[r.grupo].total += r.val;
+
+                if (!hierarchy[r.grupo].cats[r.cat]) hierarchy[r.grupo].cats[r.cat] = { total: 0, items: [] };
+                hierarchy[r.grupo].cats[r.cat].total += r.val;
+                hierarchy[r.grupo].cats[r.cat].items.push(r);
+            });
+
+            let gIndex = 0;
+            for (const grpName in hierarchy) {
+                const grpData = hierarchy[grpName];
+                const grpPct = total > 0 ? ((grpData.total / total) * 100).toFixed(1) : 0;
+                const grpRowId = `grp-${gIndex}`;
+
+                const trGrp = document.createElement('tr');
+                trGrp.className = 'row-group';
+                trGrp.onclick = () => toggleGroup(grpRowId, trGrp);
+                trGrp.innerHTML = `
+                    <td><span class="toggle-icon">▶</span> <strong>${grpName}</strong></td>
+                    <td class="text-right"><span class="badge">${grpPct}%</span></td>
+                    <td class="text-right"><strong>${fmtBRL(grpData.total)}</strong></td>
+                `;
+                tbody.appendChild(trGrp);
+
+                let cIndex = 0;
+                for (const catName in grpData.cats) {
+                    const catData = grpData.cats[catName];
+                    const catPct = grpData.total > 0 ? ((catData.total / grpData.total) * 100).toFixed(1) : 0;
+                    const catRowId = `${grpRowId}-cat-${cIndex}`;
+
+                    const trCat = document.createElement('tr');
+                    trCat.className = `row-cat ${grpRowId}`;
+                    trCat.onclick = (e) => { e.stopPropagation(); toggleCat(catRowId, trCat); };
+                    trCat.innerHTML = `
+                        <td class="indent-1"><span class="toggle-icon">▶</span> ${catName}</td>
+                        <td class="text-right"><span class="badge" style="background:#f1f5f9">${catPct}% do grupo</span></td>
+                        <td class="text-right">${fmtBRL(catData.total)}</td>
+                    `;
+                    tbody.appendChild(trCat);
+
+                    catData.items.forEach(item => {
+                        const trDesc = document.createElement('tr');
+                        trDesc.className = `row-desc ${catRowId}`;
+                        trDesc.innerHTML = `
+                            <td class="indent-2" style="color:#475569;">• ${item.desc} (${item.forn})</td>
+                            <td class="text-right"><span style="font-size:11px; color:#94a3b8;">${item.freq}</span></td>
+                            <td class="text-right">${fmtBRL(item.val)}</td>
                         `;
-                    }).join('');
-
-                    setTimeout(() => app.initTouchReorder(), 100);
-
-                    return `
-                        <div class="calendar-bar">
-                            ${calHTML}
-                        </div>
-
-                        <div class="card progress-ring-card">
-                            <div class="ring-container">
-                                <svg width="80" height="80">
-                                    <circle cx="40" cy="40" r="32" stroke="#F0D5E1" stroke-width="8" fill="none"/>
-                                    <circle cx="40" cy="40" r="32" stroke="#C97A9C" stroke-width="8" fill="none" stroke-dasharray="201" stroke-dashoffset="${201 - (201 * pct) / 100}" stroke-linecap="round"/>
-                                </svg>
-                                <div class="ring-text">${pct}%</div>
-                            </div>
-                            <div>
-                                <h3>Progresso do Dia</h3>
-                                <p style="font-size:0.85rem">${completed} de ${tasks.length} tarefas concluídas (${dayFullNames[DB.selectedDayKey]}).</p>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Checklist Diário</h3>
-                                <span style="font-size:0.75rem; color:var(--text-muted);">Toque e arraste para reordenar</span>
-                            </div>
-                            <div id="checklist-container">
-                                ${tasks.map((t, idx) => {
-                                    const key = `day_${DB.selectedDayKey}_${t.id}`;
-                                    const isDone = !!DB.checklistState[key];
-                                    return `
-                                        <div class="check-item ${isDone ? 'completed' : ''}"
-                                             data-index="${idx}"
-                                             draggable="true"
-                                             ondragstart="app.handleDragStart(event, ${idx})"
-                                             ondragover="app.handleDragOver(event)"
-                                             ondrop="app.handleDrop(event, ${idx})"
-                                             ondragend="app.handleDragEnd(event)">
-                                            <div class="check-content">
-                                                <div class="checkbox" onclick="event.stopPropagation(); app.toggleDailyTask('${t.id}')">${isDone ? '✓' : ''}</div>
-                                                <span class="check-txt" onclick="app.toggleDailyTask('${t.id}')">${t.text}</span>
-                                            </div>
-                                            <div class="drag-handle">☰</div>
-                                        </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                        </div>
-
-                        <div class="grid-2">
-                            <div class="card stat-box" onclick="app.nav('agua')">
-                                <div class="stat-lbl">Hidratação</div>
-                                <div class="stat-val">${DB.water.current} / ${DB.water.target} ml</div>
-                            </div>
-                            <div class="card stat-box" onclick="app.nav('perfil')">
-                                <div class="stat-lbl">Meta do Projeto</div>
-                                <div class="stat-val">${DB.user.weight}kg ➔ ${DB.user.targetWeight}kg</div>
-                            </div>
-                        </div>
-                    `;
-                },
-
-                alimentacao() {
-                    const tab = DB.selectedNutriTab;
-                    return `
-                        <div class="subtabs">
-                            <button class="subtab-btn ${tab === 'pretreino' ? 'active' : ''}" onclick="app.setNutriTab('pretreino')">Pré-Treino</button>
-                            <button class="subtab-btn ${tab === 'cafe' ? 'active' : ''}" onclick="app.setNutriTab('cafe')">Café</button>
-                            <button class="subtab-btn ${tab === 'almoco' ? 'active' : ''}" onclick="app.setNutriTab('almoco')">Almoço</button>
-                            <button class="subtab-btn ${tab === 'lanche' ? 'active' : ''}" onclick="app.setNutriTab('lanche')">Lanche</button>
-                            <button class="subtab-btn ${tab === 'sobremesa' ? 'active' : ''}" onclick="app.setNutriTab('sobremesa')">Sobremesas</button>
-                            <button class="subtab-btn ${tab === 'jantar' ? 'active' : ''}" onclick="app.setNutriTab('jantar')">Jantar</button>
-                        </div>
-
-                        ${tab === 'pretreino' ? `
-                            <div class="card">
-                                <div class="card-header"><h3 class="card-title">🍌 Pré-Treino</h3></div>
-                                <p><strong>Opções fáceis para energia rápida:</strong></p>
-                                <br>
-                                <div class="check-item"><span class="check-txt">• Banana</span></div>
-                                <div class="check-item"><span class="check-txt">• Pão integral</span></div>
-                            </div>
-                        ` : ''}
-
-                        ${tab === 'cafe' ? `
-                            <div class="card">
-                                <div class="card-header"><h3 class="card-title">☕ Café da Manhã</h3></div>
-                                <p><strong>Opção 1:</strong></p>
-                                <div class="check-item"><span class="check-txt">• 2 fatias de pão integral + 2 ovos</span></div>
-                                <br>
-                                <p><strong>Opção 2:</strong></p>
-                                <div class="check-item"><span class="check-txt">• Banana + Pão integral + Requeijão Light</span></div>
-                            </div>
-                        ` : ''}
-
-                        ${tab === 'almoco' ? `
-                            <div class="card">
-                                <div class="card-header"><h3 class="card-title">🥗 Almoço Balanceado</h3></div>
-                                <div class="check-item"><span class="check-txt">• Arroz</span></div>
-                                <div class="check-item"><span class="check-txt">• Feijão</span></div>
-                                <div class="check-item"><span class="check-txt">• Carne ou Frango</span></div>
-                                <div class="check-item"><span class="check-txt">• Salada fresca</span></div>
-                                <div class="check-item"><span class="check-txt">• Couve ou Abobrinha</span></div>
-                            </div>
-                        ` : ''}
-
-                        ${tab === 'lanche' ? `
-                            <div class="card">
-                                <div class="card-header"><h3 class="card-title">🍎 Lanche da Tarde</h3></div>
-                                <div class="check-item"><span class="check-txt">• Frutas variadas da sua preferência</span></div>
-                            </div>
-                        ` : ''}
-
-                        ${tab === 'sobremesa' ? `
-                            <div class="card">
-                                <div class="card-header"><h3 class="card-title">🍓 Sobremesas Fit</h3></div>
-                                <div class="check-item"><span class="check-txt">• Gelatina Zero</span></div>
-                                <div class="check-item"><span class="check-txt">• Morangos frescos</span></div>
-                                <div class="check-item"><span class="check-txt">• Uvas congeladas</span></div>
-                                <div class="check-item"><span class="check-txt">• Banana com canela aquecida</span></div>
-                            </div>
-                        ` : ''}
-
-                        ${tab === 'jantar' ? `
-                            <div class="card">
-                                <div class="card-header"><h3 class="card-title">🍲 Jantar (Escolha 1)</h3></div>
-                                <div class="check-item"><span class="check-txt">• Marmitas fit preparadas</span></div>
-                                <div class="check-item"><span class="check-txt">• Omelete recheado</span></div>
-                                <div class="check-item"><span class="check-txt">• Batata assada + Proteína</span></div>
-                                <div class="check-item"><span class="check-txt">• Saladas completas</span></div>
-                                <div class="check-item"><span class="check-txt">• Sopas leves</span></div>
-                            </div>
-                        ` : ''}
-                    `;
-                },
-
-                treinos() {
-                    const day = DB.selectedWorkoutDay;
-                    const workout = workoutsData[day];
-
-                    return `
-                        <div class="card">
-                            <label class="stat-lbl" style="display:block; margin-bottom:6px;">Selecione o Dia da Semana:</label>
-                            <select class="select-custom" onchange="app.setWorkoutDay(this.value)">
-                                <option value="segunda" ${day === 'segunda' ? 'selected' : ''}>Segunda-Feira — Glúteo & Posterior</option>
-                                <option value="terca" ${day === 'terca' ? 'selected' : ''}>Terça-Feira — Costas, Bíceps & Ombros</option>
-                                <option value="quarta" ${day === 'quarta' ? 'selected' : ''}>Quarta-Feira — Quadríceps & Glúteo Médio</option>
-                                <option value="quinta" ${day === 'quinta' ? 'selected' : ''}>Quinta-Feira — Costas, Braços & Core</option>
-                                <option value="sexta" ${day === 'sexta' ? 'selected' : ''}>Sexta-Feira — Descanso Ativo</option>
-                                <option value="sabado" ${day === 'sabado' ? 'selected' : ''}>Sábado — Glúteo Pump & Posterior</option>
-                                <option value="domingo" ${day === 'domingo' ? 'selected' : ''}>Domingo — Descanso Total</option>
-                            </select>
-
-                            <div class="card-header" style="margin-bottom:4px">
-                                <h3 class="card-title">🏋️‍♀️ ${workout.title}</h3>
-                            </div>
-                            <p style="font-size:0.85rem; margin-bottom:14px; color:var(--primary-pink-dark); font-weight:600;">${workout.desc}</p>
-
-                            ${workout.items.map((ex, idx) => {
-                                const key = `${day}_ex_${idx}`;
-                                const isDone = !!DB.workoutProgress[key];
-                                return `
-                                    <div class="check-item ${isDone ? 'completed' : ''}" onclick="app.toggleExercise('${day}', ${idx})">
-                                        <div class="check-content">
-                                            <div class="checkbox">${isDone ? '✓' : ''}</div>
-                                            <span class="check-txt">${ex}</span>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
-
-                            <button class="btn-primary" onclick="app.toast('Treino do dia finalizado com sucesso! 💪✨')">Concluir Treino de Hoje</button>
-                        </div>
-                    `;
-                },
-
-                agua() {
-                    const pct = Math.min(100, Math.round((DB.water.current / DB.water.target) * 100));
-                    return `
-                        <div class="card" style="text-align:center">
-                            <h3>Meta Diária de Água</h3>
-                            <p style="margin-top:4px; font-weight:600; color:var(--primary-pink-dark);">${DB.water.current}ml de ${DB.water.target}ml (${pct}%)</p>
-                            
-                            <div class="water-bottle">
-                                <div class="water-fill" style="height: ${pct}%"></div>
-                            </div>
-
-                            <div class="grid-2" style="margin-bottom: 10px;">
-                                <button class="btn-primary" style="background:var(--water-blue)" onclick="app.addWater(250)">+250 ml</button>
-                                <button class="btn-primary" style="background:var(--water-blue)" onclick="app.addWater(500)">+500 ml</button>
-                            </div>
-
-                            <div class="grid-2">
-                                <button class="btn-primary" style="background:#FCA5A5" onclick="app.addWater(-250)">-250 ml</button>
-                                <button class="btn-primary" style="background:var(--text-muted)" onclick="app.resetWater()">Zerar</button>
-                            </div>
-                        </div>
-                    `;
-                },
-
-                espiritual() {
-                    const rosaryDayKey = DB.selectedRosaryDay;
-                    const rosary = rosaryData[rosaryDayKey];
-
-                    return `
-                        <div class="card">
-                            <label class="stat-lbl" style="display:block; margin-bottom:6px;">Selecione o Dia da Semana:</label>
-                            <select class="select-custom" onchange="app.setRosaryDay(this.value)">
-                                <option value="segunda" ${rosaryDayKey === 'segunda' ? 'selected' : ''}>Segunda-Feira — Mistérios Gozosos</option>
-                                <option value="terca" ${rosaryDayKey === 'terca' ? 'selected' : ''}>Terça-Feira — Mistérios Dolorosos</option>
-                                <option value="quarta" ${rosaryDayKey === 'quarta' ? 'selected' : ''}>Quarta-Feira — Mistérios Gloriosos</option>
-                                <option value="quinta" ${rosaryDayKey === 'quinta' ? 'selected' : ''}>Quinta-Feira — Mistérios Luminosos</option>
-                                <option value="sexta" ${rosaryDayKey === 'sexta' ? 'selected' : ''}>Sexta-Feira — Mistérios Dolorosos</option>
-                                <option value="sabado" ${rosaryDayKey === 'sabado' ? 'selected' : ''}>Sábado — Mistérios Gozosos</option>
-                                <option value="domingo" ${rosaryDayKey === 'domingo' ? 'selected' : ''}>Domingo — Mistérios Gloriosos</option>
-                            </select>
-
-                            <div class="card-header" style="margin-bottom:4px">
-                                <h3 class="card-title">✨ ${rosary.title}</h3>
-                            </div>
-                            <p style="font-size:0.85rem; margin-bottom:14px; color:var(--primary-pink-dark); font-weight:600;">Meditação Diária do Santo Terço</p>
-
-                            ${rosary.items.map(misterio => `
-                                <div class="check-item" style="cursor:default;">
-                                    <span class="check-txt" style="font-weight:500;">${misterio}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                },
-
-                financeiro() {
-                    const monthKey = DB.selectedFinanceMonth;
-                    let paidCount = 0;
-
-                    financeItems.forEach(item => {
-                        const key = `fin_${monthKey}_${item}`;
-                        if (DB.financeState[key]) paidCount++;
+                        tbody.appendChild(trDesc);
                     });
 
-                    const pct = Math.round((paidCount / financeItems.length) * 100);
-
-                    const subtabsHTML = financeMonthsList.map(m => `
-                        <button class="subtab-btn ${m.key === monthKey ? 'active' : ''}" onclick="app.setFinanceMonth('${m.key}')">${m.label}</button>
-                    `).join('');
-
-                    return `
-                        <div class="subtabs">
-                            ${subtabsHTML}
-                        </div>
-
-                        <div class="card progress-ring-card">
-                            <div class="ring-container">
-                                <svg width="80" height="80">
-                                    <circle cx="40" cy="40" r="32" stroke="#F0D5E1" stroke-width="8" fill="none"/>
-                                    <circle cx="40" cy="40" r="32" stroke="#C97A9C" stroke-width="8" fill="none" stroke-dasharray="201" stroke-dashoffset="${201 - (201 * pct) / 100}" stroke-linecap="round"/>
-                                </svg>
-                                <div class="ring-text">${pct}%</div>
-                            </div>
-                            <div>
-                                <h3>Contas do Mês</h3>
-                                <p style="font-size:0.85rem">${paidCount} de ${financeItems.length} contas pagas neste mês.</p>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Checklist de Pagamentos</h3></div>
-                            ${financeItems.map(item => {
-                                const key = `fin_${monthKey}_${item}`;
-                                const isPaid = !!DB.financeState[key];
-                                return `
-                                    <div class="check-item ${isPaid ? 'completed' : ''}" onclick="app.toggleFinanceItem('${item}')">
-                                        <div class="check-content">
-                                            <div class="checkbox">${isPaid ? '✓' : ''}</div>
-                                            <span class="check-txt">${item}</span>
-                                        </div>
-                                        <span style="font-size:0.75rem; font-weight:700; color:${isPaid ? 'var(--primary-pink-dark)' : 'var(--text-muted)'}">
-                                            ${isPaid ? 'PAGO' : 'PENDENTE'}
-                                        </span>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    `;
-                },
-
-                perfil() {
-                    return `
-                        <div class="card">
-                            <h3>Perfil da Vanessa</h3>
-                            <br>
-                            <div class="check-item"><span class="check-txt">Idade: ${DB.user.age} anos</span></div>
-                            <div class="check-item"><span class="check-txt">Altura: ${DB.user.height}</span></div>
-                            <div class="check-item"><span class="check-txt">Peso Atual: ${DB.user.weight} kg</span></div>
-                            <div class="check-item"><span class="check-txt">Meta de Peso: ${DB.user.targetWeight} kg</span></div>
-                        </div>
-                        <div class="card">
-                            <h3>Objetivos Principais</h3>
-                            <p style="margin-top:8px; line-height:1.6">• Emagrecer e definir pernas/glúteos<br>• Desenhar costas para afinar a cintura<br>• Atingir 50kg com foco e constância</p>
-                        </div>
-                    `;
+                    cIndex++;
                 }
+                gIndex++;
             }
-        };
+        }
 
-        window.onload = () => app.init();
+        function toggleGroup(grpClass, btn) {
+            const catRows = document.querySelectorAll(`.${grpClass}`);
+            if (catRows.length === 0) return;
+            const isExpanding = catRows[0].style.display !== 'table-row';
+            
+            catRows.forEach(r => {
+                r.style.display = isExpanding ? 'table-row' : 'none';
+                if (!isExpanding) {
+                    const catId = r.className.split(' ').find(c => c.includes('cat'));
+                    if (catId) {
+                        document.querySelectorAll(`.${catId}`).forEach(d => d.style.display = 'none');
+                        r.classList.remove('expanded');
+                    }
+                }
+            });
+
+            btn.classList.toggle('expanded', isExpanding);
+        }
+
+        function toggleCat(catClass, btn) {
+            const descRows = document.querySelectorAll(`.${catClass}`);
+            if (descRows.length === 0) return;
+            const isExpanding = descRows[0].style.display !== 'table-row';
+
+            descRows.forEach(r => {
+                r.style.display = isExpanding ? 'table-row' : 'none';
+            });
+
+            btn.classList.toggle('expanded', isExpanding);
+        }
+
+        function filterTableGroup(grp, btn) {
+            currentGroupFilter = grp;
+            const btns = document.querySelectorAll('#group-filter-pills .filter-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            renderFullTable();
+        }
+
+        function renderFullTable() {
+            const tbody = document.getElementById('fullTableBody');
+            tbody.innerHTML = '';
+
+            const filtered = currentGroupFilter === 'ALL' 
+                ? currentFilteredData 
+                : currentFilteredData.filter(r => r.grupo === currentGroupFilter);
+
+            filtered.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${r.data}</td>
+                    <td><strong>${r.grupo}</strong></td>
+                    <td>${r.cat}</td>
+                    <td>${r.subcat}</td>
+                    <td>${r.desc}</td>
+                    <td>${r.forn}</td>
+                    <td><span class="badge">${r.freq}</span></td>
+                    <td class="text-right"><strong>${fmtBRL(r.val)}</strong></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.onload = () => {
+            lucide.createIcons();
+            updateDashboard();
+        };
     </script>
-</body>
-</html>
+
+
+</body></html>
