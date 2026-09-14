@@ -105,7 +105,14 @@
             align-items: center;
             gap: 0.75rem;
         }
-
+<!-- Campo de Upload de Planilha Excel -->
+<div class="filter-group" style="background-color: var(--primary); color: #ffffff; border-color: var(--primary);">
+    <i class="fa-solid fa-file-excel" style="color: #ffffff;"></i>
+    <label for="excel-upload" style="cursor: pointer; font-size: 0.875rem; font-weight: 600; white-space: nowrap;">
+        Carregar Planilha
+    </label>
+    <input type="file" id="excel-upload" accept=".xlsx, .xls" onchange="handleFileUpload(event)" style="display: none;">
+</div>
         .filter-group {
             display: flex;
             align-items: center;
@@ -1416,5 +1423,73 @@
             return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         }
     </script>
+<!-- Biblioteca para leitura de arquivos Excel no navegador -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+// Função para processar o upload do arquivo Excel
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+
+            // Pega a primeira aba da planilha
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+
+            // Converte a aba em matriz de dados (array de arrays)
+            const rawMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            // Remove a primeira linha se for o cabeçalho (nomes das colunas)
+            if (rawMatrix.length > 0 && typeof rawMatrix[0][0] === 'string' && rawMatrix[0][0].toLowerCase().includes('mês')) {
+                rawMatrix.shift();
+            }
+
+            // Normaliza as datas/textos de cada linha para o formato esperado pelo dashboard
+            const processedRows = rawMatrix.filter(row => row.length > 0 && row[2]).map(row => {
+                // Formatação simples para garantir campos de data como YYYY-MM-DD
+                const formatExcelDate = (val) => {
+                    if (!val) return '';
+                    if (val instanceof Date) return val.toISOString().split('T')[0];
+                    if (typeof val === 'number') {
+                        const dateObj = new Date((val - (25567 + 2)) * 86400 * 1000);
+                        return dateObj.toISOString().split('T')[0];
+                    }
+                    return String(val).split(' ')[0];
+                };
+
+                return [
+                    formatExcelDate(row[0]), // MÊS
+                    formatExcelDate(row[1]), // DATA DE ABERTURA
+                    String(row[2] || ''),    // CHAMADO
+                    String(row[3] || ''),    // SERIAL
+                    String(row[4] || ''),    // MODELO
+                    String(row[5] || ''),    // POSTO
+                    String(row[6] || ''),    // CLIENTE
+                    String(row[7] || ''),    // SLA
+                    String(row[8] || ''),    // UF
+                    String(row[9] || ''),    // PROBLEMA
+                    formatExcelDate(row[10]),// DATA DE ENCERRAMENTO
+                    String(row[11] || ''),   // STATUS
+                    String(row[12] || '')    // SOLUÇÃO
+                ];
+            });
+
+            // Atualiza os dados do dashboard e re-renderiza as abas e gráficos
+            processRawData(processedRows);
+
+            alert(`Planilha carregada com sucesso! Total de ${processedRows.length} chamados processados.`);
+        } catch (error) {
+            console.error("Erro ao ler a planilha:", error);
+            alert("Ocorreu um erro ao processar o arquivo Excel. Verifique se o formato das colunas está correto.");
+        }
+    };
+
+    reader.readAsArrayBuffer(file);
+}
 </body>
 </html>
