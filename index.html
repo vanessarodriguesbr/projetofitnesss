@@ -1424,8 +1424,8 @@
         }
     </script>
 <!-- Biblioteca para leitura de arquivos Excel no navegador -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-// Função para processar o upload do arquivo Excel
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
+    // Função para processar o upload do arquivo Excel
 function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -1491,5 +1491,6 @@ function handleFileUpload(event) {
 
     reader.readAsArrayBuffer(file);
 }
+</script>
 </body>
 </html>
