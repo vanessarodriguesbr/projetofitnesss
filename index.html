@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RELATÓRIO DE CHAMADOS DETALHADOS</title>
-    <!-- FontAwesome CDN para garantir que nenhum ícone fique quebrado -->
+    <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js para visualizações na Visão Geral -->
+    <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS para leitura de arquivos Excel (.xlsx) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
     <style>
         :root {
             --bg-color: #f8fafc;
@@ -21,7 +24,7 @@
             --table-header: #f1f5f9;
             --table-hover: #f8fafc;
             --table-zebra: #fdfdfd;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             --map-fill: #cbd5e1;
             --map-stroke: #ffffff;
             --map-hover: #3b82f6;
@@ -57,8 +60,8 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            transition: background-color 0.2s, color 0.2s;
         }
 
         body {
@@ -105,14 +108,7 @@
             align-items: center;
             gap: 0.75rem;
         }
-<!-- Campo de Upload de Planilha Excel -->
-<div class="filter-group" style="background-color: var(--primary); color: #ffffff; border-color: var(--primary);">
-    <i class="fa-solid fa-file-excel" style="color: #ffffff;"></i>
-    <label for="excel-upload" style="cursor: pointer; font-size: 0.875rem; font-weight: 600; white-space: nowrap;">
-        Carregar Planilha
-    </label>
-    <input type="file" id="excel-upload" accept=".xlsx, .xls" onchange="handleFileUpload(event)" style="display: none;">
-</div>
+
         .filter-group {
             display: flex;
             align-items: center;
@@ -139,6 +135,24 @@
             width: 180px;
         }
 
+        .btn-upload {
+            background-color: #16a34a;
+            color: #ffffff !important;
+            border: none;
+            padding: 0.5rem 0.85rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .btn-upload:hover {
+            background-color: #15803d;
+        }
+
         .theme-toggle {
             background-color: var(--bg-color);
             border: 1px solid var(--border-color);
@@ -151,10 +165,6 @@
             gap: 0.5rem;
             font-weight: 600;
             font-size: 0.875rem;
-        }
-
-        .theme-toggle:hover {
-            border-color: var(--primary);
         }
 
         /* NAV TABS */
@@ -184,10 +194,6 @@
             align-items: center;
             gap: 0.5rem;
             white-space: nowrap;
-        }
-
-        .nav-tab:hover {
-            color: var(--primary);
         }
 
         .nav-tab.active {
@@ -235,7 +241,6 @@
             font-size: 0.8rem;
             text-transform: uppercase;
             color: var(--text-muted);
-            letter-spacing: 0.05em;
             margin-bottom: 0.5rem;
         }
 
@@ -256,7 +261,7 @@
             font-size: 1.25rem;
         }
 
-        /* DASHBOARD CHARTS GRID */
+        /* CHARTS */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -270,15 +275,6 @@
             border-radius: 12px;
             padding: 1.25rem;
             box-shadow: var(--shadow);
-        }
-
-        .chart-card h4 {
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-color);
         }
 
         .chart-container {
@@ -303,16 +299,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: var(--card-bg);
-        }
-
-        .table-header-title h4 {
-            font-size: 1rem;
-            font-weight: 600;
         }
 
         .table-wrapper {
-            max-height: 550px;
+            max-height: 500px;
             overflow-y: auto;
         }
 
@@ -327,112 +317,55 @@
             position: sticky;
             top: 0;
             background-color: var(--table-header);
-            color: var(--text-color);
-            font-weight: 600;
             padding: 0.75rem 1rem;
             border-bottom: 1px solid var(--border-color);
             white-space: nowrap;
-            z-index: 10;
         }
 
         td {
             padding: 0.75rem 1rem;
             border-bottom: 1px solid var(--border-color);
-            color: var(--text-color);
             white-space: nowrap;
         }
 
-        tr:nth-child(even) {
-            background-color: var(--table-zebra);
-        }
+        tr:nth-child(even) { background-color: var(--table-zebra); }
+        tr:hover { background-color: var(--table-hover); }
 
-        tr:hover {
-            background-color: var(--table-hover);
-        }
-
-        .clickable-row {
-            cursor: pointer;
-        }
-
-        .clickable-row:hover td {
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        /* BADGES */
         .badge {
             padding: 0.25rem 0.6rem;
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
         }
 
-        .badge-open {
-            background-color: var(--badge-open-bg);
-            color: var(--badge-open-text);
-        }
+        .badge-open { background-color: var(--badge-open-bg); color: var(--badge-open-text); }
+        .badge-closed { background-color: var(--badge-closed-bg); color: var(--badge-closed-text); }
 
-        .badge-closed {
-            background-color: var(--badge-closed-bg);
-            color: var(--badge-closed-text);
-        }
-
-        /* MAP LAYOUT */
+        /* MAP */
         .map-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1.5rem;
         }
 
-        @media (max-width: 992px) {
-            .map-layout {
-                grid-template-columns: 1fr;
-            }
-        }
+        @media (max-width: 992px) { .map-layout { grid-template-columns: 1fr; } }
 
         .map-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 1.25rem;
-            box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
         }
 
-        .svg-container {
-            width: 100%;
-            max-width: 500px;
-            height: auto;
-        }
+        .svg-container { width: 100%; max-width: 480px; }
+        .uf-path { fill: var(--map-fill); stroke: var(--map-stroke); stroke-width: 1.5; cursor: pointer; }
+        .uf-path:hover, .uf-path.active-uf { fill: var(--map-hover); }
+        .uf-text { fill: #fff; font-size: 11px; font-weight: bold; pointer-events: none; text-anchor: middle; dominant-baseline: central; }
 
-        .uf-path {
-            fill: var(--map-fill);
-            stroke: var(--map-stroke);
-            stroke-width: 1.5;
-            cursor: pointer;
-            transition: fill 0.2s, transform 0.2s;
-        }
-
-        .uf-path:hover, .uf-path.active-uf {
-            fill: var(--map-hover);
-        }
-
-        .uf-text {
-            fill: #ffffff;
-            font-size: 11px;
-            font-weight: bold;
-            pointer-events: none;
-            text-anchor: middle;
-            dominant-baseline: central;
-        }
-
-        /* TOOLTIP MAPA */
         .map-tooltip {
             position: absolute;
             background: rgba(15, 23, 42, 0.9);
@@ -443,10 +376,8 @@
             pointer-events: none;
             display: none;
             z-index: 100;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
-        /* BACK BUTTON FOR DRILLDOWN */
         .btn-back {
             background-color: var(--primary);
             color: #fff;
@@ -455,25 +386,23 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
             margin-bottom: 0.5rem;
         }
 
-        .btn-back:hover {
-            background-color: var(--primary-hover);
+        .empty-notice {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
         }
 
-        /* FOOTER */
         footer {
             text-align: center;
             padding: 1.5rem;
             color: var(--text-muted);
             font-size: 0.85rem;
             border-top: 1px solid var(--border-color);
-            margin-top: auto;
             background-color: var(--card-bg);
+            margin-top: auto;
         }
     </style>
 </head>
@@ -488,19 +417,18 @@
             </div>
 
             <div class="controls-container">
+                <!-- Botão de Upload Excel -->
+                <label for="excel-upload" class="btn-upload">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>Carregar Planilha</span>
+                </label>
+                <input type="file" id="excel-upload" accept=".xlsx, .xls" onchange="handleFileUpload(event)" style="display: none;">
+
                 <!-- Filtro por Período -->
                 <div class="filter-group">
                     <i class="fa-regular fa-calendar-days"></i>
                     <select id="filter-periodo" onchange="applyFilters()">
                         <option value="TODOS">Todos os Meses</option>
-                        <option value="Janeiro">Janeiro</option>
-                        <option value="Fevereiro">Fevereiro</option>
-                        <option value="Março">Março</option>
-                        <option value="Abril">Abril</option>
-                        <option value="Maio">Maio</option>
-                        <option value="Junho">Junho</option>
-                        <option value="Julho">Julho</option>
-                        <option value="Agosto">Agosto</option>
                     </select>
                 </div>
 
@@ -509,18 +437,16 @@
                     <i class="fa-solid fa-list-check"></i>
                     <select id="filter-status" onchange="applyFilters()">
                         <option value="TODOS">Todos os Status</option>
-                        <option value="ENCERRADO">Encerrado</option>
-                        <option value="ABERTO">Aberto</option>
                     </select>
                 </div>
 
                 <!-- Campo de Busca Global -->
                 <div class="filter-group">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="filter-search" placeholder="Buscar posto, cliente, modelo..." oninput="applyFilters()">
+                    <input type="text" id="filter-search" placeholder="Buscar posto, cliente..." oninput="applyFilters()">
                 </div>
 
-                <!-- Botão de Alternância de Tema -->
+                <!-- Botão Tema -->
                 <button class="theme-toggle" onclick="toggleTheme()">
                     <i class="fa-solid fa-moon" id="theme-icon"></i>
                     <span id="theme-text">Modo Escuro</span>
@@ -529,7 +455,7 @@
         </div>
     </header>
 
-    <!-- NAVEGAÇÃO / ABAS -->
+    <!-- NAVEGAÇÃO -->
     <nav>
         <div class="nav-container">
             <button class="nav-tab active" onclick="switchTab('visao-geral', this)">
@@ -552,7 +478,6 @@
 
     <!-- CONTEÚDO PRINCIPAL -->
     <main>
-        <!-- TOOLTIP MAPA -->
         <div id="map-tooltip" class="map-tooltip"></div>
 
         <!-- ABA 1: VISÃO GERAL -->
@@ -595,34 +520,25 @@
             <div class="charts-grid">
                 <div class="chart-card">
                     <h4><i class="fa-solid fa-chart-line"></i> Chamados por Período</h4>
-                    <div class="chart-container">
-                        <canvas id="chart-meses"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="chart-meses"></canvas></div>
                 </div>
                 <div class="chart-card">
                     <h4><i class="fa-solid fa-chart-pie"></i> Status dos Chamados</h4>
-                    <div class="chart-container">
-                        <canvas id="chart-status"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="chart-status"></canvas></div>
                 </div>
                 <div class="chart-card">
-                    <h4><i class="fa-solid fa-ranking-star"></i> Top 5 Postos com mais Chamados</h4>
-                    <div class="chart-container">
-                        <canvas id="chart-top-postos"></canvas>
-                    </div>
+                    <h4><i class="fa-solid fa-ranking-star"></i> Top 5 Postos</h4>
+                    <div class="chart-container"><canvas id="chart-top-postos"></canvas></div>
                 </div>
                 <div class="chart-card">
                     <h4><i class="fa-solid fa-laptop"></i> Chamados por Modelo</h4>
-                    <div class="chart-container">
-                        <canvas id="chart-modelos"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="chart-modelos"></canvas></div>
                 </div>
             </div>
 
-            <!-- Tabela Completa na Visão Geral -->
             <div class="table-card">
                 <div class="table-header-title">
-                    <h4><i class="fa-solid fa-list"></i> Todos os Chamados Selecionados (<span id="count-geral">0</span>)</h4>
+                    <h4><i class="fa-solid fa-list"></i> Todos os Chamados (<span id="count-geral">0</span>)</h4>
                 </div>
                 <div class="table-wrapper">
                     <table>
@@ -640,7 +556,9 @@
                                 <th>Encerramento</th>
                             </tr>
                         </thead>
-                        <tbody id="tbody-geral"></tbody>
+                        <tbody id="tbody-geral">
+                            <tr><td colspan="10" class="empty-notice"><i class="fa-solid fa-file-excel fa-2x"></i><br><br>Clique no botão <strong>"Carregar Planilha"</strong> no menu superior para visualizar os dados.</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -650,151 +568,41 @@
         <section id="tab-regiao" class="tab-content">
             <div class="map-layout">
                 <div class="map-card">
-                    <h4 style="margin-bottom: 1rem; width: 100%; text-align: left;">
-                        <i class="fa-solid fa-map-marked-alt"></i> Clique em um Estado (UF) para detalhar
-                    </h4>
-                    <!-- MAPA DO BRASIL SVG COMPACTO E RESPONSIVO -->
+                    <h4 style="margin-bottom: 1rem; width: 100%;"><i class="fa-solid fa-map-marked-alt"></i> Clique em um Estado (UF)</h4>
                     <div class="svg-container">
                         <svg viewBox="0 0 600 600" id="brazil-map">
-                            <!-- RR -->
-                            <g class="uf-group" data-uf="RR">
-                                <path class="uf-path" id="map-RR" d="M 220,40 L 260,35 L 270,75 L 230,95 L 210,70 Z" />
-                                <text x="238" y="62" class="uf-text">RR</text>
-                            </g>
-                            <!-- AP -->
-                            <g class="uf-group" data-uf="AP">
-                                <path class="uf-path" id="map-AP" d="M 350,60 L 390,70 L 370,120 L 340,100 Z" />
-                                <text x="362" y="88" class="uf-text">AP</text>
-                            </g>
-                            <!-- AM -->
-                            <g class="uf-group" data-uf="AM">
-                                <path class="uf-path" id="map-AM" d="M 100,80 L 210,75 L 230,98 L 220,170 L 120,180 L 80,130 Z" />
-                                <text x="160" y="130" class="uf-text">AM</text>
-                            </g>
-                            <!-- PA -->
-                            <g class="uf-group" data-uf="PA">
-                                <path class="uf-path" id="map-PA" d="M 235,98 L 335,100 L 365,125 L 345,210 L 255,200 L 225,170 Z" />
-                                <text x="295" y="150" class="uf-text">PA</text>
-                            </g>
-                            <!-- MA -->
-                            <g class="uf-group" data-uf="MA">
-                                <path class="uf-path" id="map-MA" d="M 350,130 L 400,140 L 390,210 L 350,205 Z" />
-                                <text x="372" y="170" class="uf-text">MA</text>
-                            </g>
-                            <!-- CE -->
-                            <g class="uf-group" data-uf="CE">
-                                <path class="uf-path" id="map-CE" d="M 435,145 L 480,150 L 470,185 L 430,180 Z" />
-                                <text x="454" y="165" class="uf-text">CE</text>
-                            </g>
-                            <!-- RN -->
-                            <g class="uf-group" data-uf="RN">
-                                <path class="uf-path" id="map-RN" d="M 482,152 L 525,155 L 520,175 L 482,170 Z" />
-                                <text x="502" y="163" class="uf-text">RN</text>
-                            </g>
-                            <!-- PB -->
-                            <g class="uf-group" data-uf="PB">
-                                <path class="uf-path" id="map-PB" d="M 475,175 L 530,177 L 525,192 L 472,190 Z" />
-                                <text x="500" y="183" class="uf-text">PB</text>
-                            </g>
-                            <!-- PE -->
-                            <g class="uf-group" data-uf="PE">
-                                <path class="uf-path" id="map-PE" d="M 430,185 L 530,195 L 520,212 L 420,202 Z" />
-                                <text x="475" y="198" class="uf-text">PE</text>
-                            </g>
-                            <!-- AL -->
-                            <g class="uf-group" data-uf="AL">
-                                <path class="uf-path" id="map-AL" d="M 480,215 L 520,217 L 510,230 L 475,225 Z" />
-                                <text x="496" y="222" class="uf-text">AL</text>
-                            </g>
-                            <!-- SE -->
-                            <g class="uf-group" data-uf="SE">
-                                <path class="uf-path" id="map-SE" d="M 470,230 L 505,233 L 495,248 L 465,242 Z" />
-                                <text x="484" y="238" class="uf-text">SE</text>
-                            </g>
-                            <!-- PI -->
-                            <g class="uf-group" data-uf="PI">
-                                <path class="uf-path" id="map-PI" d="M 402,145 L 432,148 L 425,225 L 392,212 Z" />
-                                <text x="412" y="182" class="uf-text">PI</text>
-                            </g>
-                            <!-- TO -->
-                            <g class="uf-group" data-uf="TO">
-                                <path class="uf-path" id="map-TO" d="M 315,205 L 350,208 L 345,300 L 310,280 Z" />
-                                <text x="330" y="250" class="uf-text">TO</text>
-                            </g>
-                            <!-- RO -->
-                            <g class="uf-group" data-uf="RO">
-                                <path class="uf-path" id="map-RO" d="M 125,185 L 180,182 L 195,250 L 150,255 Z" />
-                                <text x="160" y="218" class="uf-text">RO</text>
-                            </g>
-                            <!-- AC -->
-                            <g class="uf-group" data-uf="AC">
-                                <path class="uf-path" id="map-AC" d="M 30,195 L 120,188 L 115,225 L 45,235 Z" />
-                                <text x="75" y="210" class="uf-text">AC</text>
-                            </g>
-                            <!-- BA -->
-                            <g class="uf-group" data-uf="BA">
-                                <path class="uf-path" id="map-BA" d="M 352,210 L 422,228 L 465,245 L 440,335 L 350,302 Z" />
-                                <text x="400" y="270" class="uf-text">BA</text>
-                            </g>
-                            <!-- MT -->
-                            <g class="uf-group" data-uf="MT">
-                                <path class="uf-path" id="map-MT" d="M 185,185 L 252,203 L 308,282 L 210,320 L 198,252 Z" />
-                                <text x="240" y="250" class="uf-text">MT</text>
-                            </g>
-                            <!-- GO & DF -->
-                            <g class="uf-group" data-uf="GO">
-                                <path class="uf-path" id="map-GO" d="M 310,285 L 348,305 L 335,370 L 275,350 L 275,322 Z" />
-                                <text x="310" y="328" class="uf-text">GO</text>
-                            </g>
-                            <g class="uf-group" data-uf="DF">
-                                <circle class="uf-path" id="map-DF" cx="328" cy="325" r="10" />
-                                <text x="328" y="325" class="uf-text" style="font-size: 8px;">DF</text>
-                            </g>
-                            <!-- MS -->
-                            <g class="uf-group" data-uf="MS">
-                                <path class="uf-path" id="map-MS" d="M 208,325 L 272,352 L 255,420 L 195,385 Z" />
-                                <text x="232" y="370" class="uf-text">MS</text>
-                            </g>
-                            <!-- MG -->
-                            <g class="uf-group" data-uf="MG">
-                                <path class="uf-path" id="map-MG" d="M 338,372 L 438,338 L 430,410 L 335,420 Z" />
-                                <text x="382" y="385" class="uf-text">MG</text>
-                            </g>
-                            <!-- ES -->
-                            <g class="uf-group" data-uf="ES">
-                                <path class="uf-path" id="map-ES" d="M 440,380 L 468,382 L 458,418 L 432,412 Z" />
-                                <text x="450" y="398" class="uf-text">ES</text>
-                            </g>
-                            <!-- RJ -->
-                            <g class="uf-group" data-uf="RJ">
-                                <path class="uf-path" id="map-RJ" d="M 405,418 L 452,420 L 438,445 L 398,435 Z" />
-                                <text x="424" y="430" class="uf-text">RJ</text>
-                            </g>
-                            <!-- SP -->
-                            <g class="uf-group" data-uf="SP">
-                                <path class="uf-path" id="map-SP" d="M 275,355 L 332,372 L 392,430 L 295,445 L 258,422 Z" />
-                                <text x="315" y="405" class="uf-text">SP</text>
-                            </g>
-                            <!-- PR -->
-                            <g class="uf-group" data-uf="PR">
-                                <path class="uf-path" id="map-PR" d="M 252,425 L 292,448 L 278,485 L 235,465 Z" />
-                                <text x="264" y="455" class="uf-text">PR</text>
-                            </g>
-                            <!-- SC -->
-                            <g class="uf-group" data-uf="SC">
-                                <path class="uf-path" id="map-SC" d="M 240,468 L 285,488 L 272,515 L 230,495 Z" />
-                                <text x="256" y="490" class="uf-text">SC</text>
-                            </g>
-                            <!-- RS -->
-                            <g class="uf-group" data-uf="RS">
-                                <path class="uf-path" id="map-RS" d="M 228,498 L 270,518 L 245,570 L 195,540 Z" />
-                                <text x="234" y="532" class="uf-text">RS</text>
-                            </g>
+                            <g class="uf-group" data-uf="RR"><path class="uf-path" d="M 220,40 L 260,35 L 270,75 L 230,95 L 210,70 Z" /><text x="238" y="62" class="uf-text">RR</text></g>
+                            <g class="uf-group" data-uf="AP"><path class="uf-path" d="M 350,60 L 390,70 L 370,120 L 340,100 Z" /><text x="362" y="88" class="uf-text">AP</text></g>
+                            <g class="uf-group" data-uf="AM"><path class="uf-path" d="M 100,80 L 210,75 L 230,98 L 220,170 L 120,180 L 80,130 Z" /><text x="160" y="130" class="uf-text">AM</text></g>
+                            <g class="uf-group" data-uf="PA"><path class="uf-path" d="M 235,98 L 335,100 L 365,125 L 345,210 L 255,200 L 225,170 Z" /><text x="295" y="150" class="uf-text">PA</text></g>
+                            <g class="uf-group" data-uf="MA"><path class="uf-path" d="M 350,130 L 400,140 L 390,210 L 350,205 Z" /><text x="372" y="170" class="uf-text">MA</text></g>
+                            <g class="uf-group" data-uf="CE"><path class="uf-path" d="M 435,145 L 480,150 L 470,185 L 430,180 Z" /><text x="454" y="165" class="uf-text">CE</text></g>
+                            <g class="uf-group" data-uf="RN"><path class="uf-path" d="M 482,152 L 525,155 L 520,175 L 482,170 Z" /><text x="502" y="163" class="uf-text">RN</text></g>
+                            <g class="uf-group" data-uf="PB"><path class="uf-path" d="M 475,175 L 530,177 L 525,192 L 472,190 Z" /><text x="500" y="183" class="uf-text">PB</text></g>
+                            <g class="uf-group" data-uf="PE"><path class="uf-path" d="M 430,185 L 530,195 L 520,212 L 420,202 Z" /><text x="475" y="198" class="uf-text">PE</text></g>
+                            <g class="uf-group" data-uf="AL"><path class="uf-path" d="M 480,215 L 520,217 L 510,230 L 475,225 Z" /><text x="496" y="222" class="uf-text">AL</text></g>
+                            <g class="uf-group" data-uf="SE"><path class="uf-path" d="M 470,230 L 505,233 L 495,248 L 465,242 Z" /><text x="484" y="238" class="uf-text">SE</text></g>
+                            <g class="uf-group" data-uf="PI"><path class="uf-path" d="M 402,145 L 432,148 L 425,225 L 392,212 Z" /><text x="412" y="182" class="uf-text">PI</text></g>
+                            <g class="uf-group" data-uf="TO"><path class="uf-path" d="M 315,205 L 350,208 L 345,300 L 310,280 Z" /><text x="330" y="250" class="uf-text">TO</text></g>
+                            <g class="uf-group" data-uf="RO"><path class="uf-path" d="M 125,185 L 180,182 L 195,250 L 150,255 Z" /><text x="160" y="218" class="uf-text">RO</text></g>
+                            <g class="uf-group" data-uf="AC"><path class="uf-path" d="M 30,195 L 120,188 L 115,225 L 45,235 Z" /><text x="75" y="210" class="uf-text">AC</text></g>
+                            <g class="uf-group" data-uf="BA"><path class="uf-path" d="M 352,210 L 422,228 L 465,245 L 440,335 L 350,302 Z" /><text x="400" y="270" class="uf-text">BA</text></g>
+                            <g class="uf-group" data-uf="MT"><path class="uf-path" d="M 185,185 L 252,203 L 308,282 L 210,320 L 198,252 Z" /><text x="240" y="250" class="uf-text">MT</text></g>
+                            <g class="uf-group" data-uf="GO"><path class="uf-path" d="M 310,285 L 348,305 L 335,370 L 275,350 L 275,322 Z" /><text x="310" y="328" class="uf-text">GO</text></g>
+                            <g class="uf-group" data-uf="DF"><circle class="uf-path" cx="328" cy="325" r="10" /><text x="328" y="325" class="uf-text" style="font-size: 8px;">DF</text></g>
+                            <g class="uf-group" data-uf="MS"><path class="uf-path" d="M 208,325 L 272,352 L 255,420 L 195,385 Z" /><text x="232" y="370" class="uf-text">MS</text></g>
+                            <g class="uf-group" data-uf="MG"><path class="uf-path" d="M 338,372 L 438,338 L 430,410 L 335,420 Z" /><text x="382" y="385" class="uf-text">MG</text></g>
+                            <g class="uf-group" data-uf="ES"><path class="uf-path" d="M 440,380 L 468,382 L 458,418 L 432,412 Z" /><text x="450" y="398" class="uf-text">ES</text></g>
+                            <g class="uf-group" data-uf="RJ"><path class="uf-path" d="M 405,418 L 452,420 L 438,445 L 398,435 Z" /><text x="424" y="430" class="uf-text">RJ</text></g>
+                            <g class="uf-group" data-uf="SP"><path class="uf-path" d="M 275,355 L 332,372 L 392,430 L 295,445 L 258,422 Z" /><text x="315" y="405" class="uf-text">SP</text></g>
+                            <g class="uf-group" data-uf="PR"><path class="uf-path" d="M 252,425 L 292,448 L 278,485 L 235,465 Z" /><text x="264" y="455" class="uf-text">PR</text></g>
+                            <g class="uf-group" data-uf="SC"><path class="uf-path" d="M 240,468 L 285,488 L 272,515 L 230,495 Z" /><text x="256" y="490" class="uf-text">SC</text></g>
+                            <g class="uf-group" data-uf="RS"><path class="uf-path" d="M 228,498 L 270,518 L 245,570 L 195,540 Z" /><text x="234" y="532" class="uf-text">RS</text></g>
                         </svg>
                     </div>
                 </div>
 
-                <div class="table-card" style="margin-bottom: 0;">
+                <div class="table-card">
                     <div class="table-header-title">
                         <h4 id="title-regiao-detail"><i class="fa-solid fa-location-dot"></i> Selecione um Estado no Mapa</h4>
                         <span class="badge badge-closed" id="badge-uf-count">0 chamados</span>
@@ -811,7 +619,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tbody-regiao">
-                                <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Clique em uma UF no mapa para visualizar os chamados.</td></tr>
+                                <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Clique em um estado no mapa.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -824,15 +632,15 @@
             <div id="posto-summary-view">
                 <div class="table-card">
                     <div class="table-header-title">
-                        <h4><i class="fa-solid fa-store"></i> Resumo de Chamados por Posto</h4>
+                        <h4><i class="fa-solid fa-store"></i> Resumo por Posto</h4>
                     </div>
                     <div class="table-wrapper">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Nome do Posto</th>
+                                    <th>Posto</th>
                                     <th>UF</th>
-                                    <th>Qtd Total de Chamados</th>
+                                    <th>Total de Chamados</th>
                                     <th>Ação</th>
                                 </tr>
                             </thead>
@@ -841,13 +649,10 @@
                     </div>
                 </div>
             </div>
-
             <div id="posto-detail-view" style="display: none;">
-                <button class="btn-back" onclick="closePostoDetail()"><i class="fa-solid fa-arrow-left"></i> Voltar para Lista de Postos</button>
+                <button class="btn-back" onclick="closePostoDetail()"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
                 <div class="table-card">
-                    <div class="table-header-title">
-                        <h4 id="posto-detail-title">Detalhes do Posto</h4>
-                    </div>
+                    <div class="table-header-title"><h4 id="posto-detail-title">Detalhes do Posto</h4></div>
                     <div class="table-wrapper">
                         <table>
                             <thead>
@@ -859,7 +664,6 @@
                                     <th>Serial</th>
                                     <th>Problema</th>
                                     <th>Status</th>
-                                    <th>Solução</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-posto-detail"></tbody>
@@ -874,14 +678,14 @@
             <div id="cliente-summary-view">
                 <div class="table-card">
                     <div class="table-header-title">
-                        <h4><i class="fa-solid fa-building"></i> Resumo de Chamados por Cliente</h4>
+                        <h4><i class="fa-solid fa-building"></i> Resumo por Cliente</h4>
                     </div>
                     <div class="table-wrapper">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Nome do Cliente</th>
-                                    <th>Qtd Total de Chamados</th>
+                                    <th>Cliente</th>
+                                    <th>Total de Chamados</th>
                                     <th>Ação</th>
                                 </tr>
                             </thead>
@@ -890,13 +694,10 @@
                     </div>
                 </div>
             </div>
-
             <div id="cliente-detail-view" style="display: none;">
-                <button class="btn-back" onclick="closeClienteDetail()"><i class="fa-solid fa-arrow-left"></i> Voltar para Lista de Clientes</button>
+                <button class="btn-back" onclick="closeClienteDetail()"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
                 <div class="table-card">
-                    <div class="table-header-title">
-                        <h4 id="cliente-detail-title">Detalhes do Cliente</h4>
-                    </div>
+                    <div class="table-header-title"><h4 id="cliente-detail-title">Detalhes do Cliente</h4></div>
                     <div class="table-wrapper">
                         <table>
                             <thead>
@@ -908,7 +709,6 @@
                                     <th>Modelo</th>
                                     <th>Problema</th>
                                     <th>Status</th>
-                                    <th>Solução</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-cliente-detail"></tbody>
@@ -918,19 +718,19 @@
             </div>
         </section>
 
-        <!-- ABA 5: POR MODELO DE EQUIPAMENTO -->
+        <!-- ABA 5: POR MODELO -->
         <section id="tab-modelo" class="tab-content">
             <div id="modelo-summary-view">
                 <div class="table-card">
                     <div class="table-header-title">
-                        <h4><i class="fa-solid fa-microchip"></i> Resumo por Modelo de Equipamento</h4>
+                        <h4><i class="fa-solid fa-microchip"></i> Resumo por Modelo</h4>
                     </div>
                     <div class="table-wrapper">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Modelo de Equipamento</th>
-                                    <th>Qtd Total de Chamados</th>
+                                    <th>Modelo</th>
+                                    <th>Total de Chamados</th>
                                     <th>Ação</th>
                                 </tr>
                             </thead>
@@ -939,13 +739,10 @@
                     </div>
                 </div>
             </div>
-
             <div id="modelo-detail-view" style="display: none;">
-                <button class="btn-back" onclick="closeModeloDetail()"><i class="fa-solid fa-arrow-left"></i> Voltar para Lista de Modelos</button>
+                <button class="btn-back" onclick="closeModeloDetail()"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
                 <div class="table-card">
-                    <div class="table-header-title">
-                        <h4 id="modelo-detail-title">Detalhes do Modelo</h4>
-                    </div>
+                    <div class="table-header-title"><h4 id="modelo-detail-title">Detalhes do Modelo</h4></div>
                     <div class="table-wrapper">
                         <table>
                             <thead>
@@ -957,7 +754,6 @@
                                     <th>Serial</th>
                                     <th>Problema</th>
                                     <th>Status</th>
-                                    <th>Solução</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-modelo-detail"></tbody>
@@ -969,119 +765,97 @@
     </main>
 
     <footer>
-        RELATÓRIO DE CHAMADOS DETALHADOS &copy; 2026 - Desenvolvido para GitHub Pages
+        RELATÓRIO DE CHAMADOS DETALHADOS &copy; 2026
     </footer>
 
-    <!-- INÍCIO DO JAVASCRIPT COM OS DADOS INTEGRADOS -->
     <script>
-        // Mapeamento dos meses para legibilidade
-        const MONTH_MAP = {
-            '2026-01-26': 'Janeiro',
-            '2026-02-26': 'Fevereiro',
-            '2026-03-26': 'Março',
-            '2026-04-26': 'Abril',
-            '2026-05-26': 'Maio',
-            '2026-06-26': 'Junho',
-            '2026-07-26': 'Julho',
-            '2026-08-26': 'Agosto'
-        };
-
-        // Mapeamento de normalização de UFs para tratar exceções como BH->MG e PV->RO
-        const UF_NORMALIZER = {
-            'BH': 'MG',
-            'PV': 'RO'
-        };
-
-        // DADOS REAIS EXTRAÍDOS DA PLANILHA (1291 REGISTROS EXATOS)
-        // Estrutura do array: [MÊS, DATA_ABERTURA, CHAMADO, SERIAL, MODELO, POSTO, CLIENTE, SLA, UF, PROBLEMA, DATA_ENCERRAMENTO, STATUS, SOLUÇÃO]
-        const RAW_DATA = [
-            // Os dados completos serão carregados via script dinâmico minificado
-        ];
-    </script>
-    <script src="data.json" type="application/json" id="embedded-data"></script>
-    <script>
-        // Script principal de gerenciamento
         let ALL_DATA = [];
         let FILTERED_DATA = [];
         let chartMeses, chartStatus, chartTopPostos, chartModelos;
         let selectedUF = null;
 
-        // Inicialização
+        const UF_NORMALIZER = { 'BH': 'MG', 'PV': 'RO' };
+
         document.addEventListener("DOMContentLoaded", () => {
-            fetchDataAndInit();
+            setupMapEvents();
         });
 
-        function fetchDataAndInit() {
-            // Embutindo o array gerado diretamente
-            fetch('data.json')
-                .then(res => res.json())
-                .then(data => {
-                    processRawData(data);
-                })
-                .catch(err => {
-                    console.error("Erro ao carregar dados:", err);
-                });
+        // LEITURA DO EXCEL
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    if (json.length <= 1) {
+                        alert("Planilha vazia ou sem dados válidos.");
+                        return;
+                    }
+
+                    // Remove cabeçalho se houver
+                    if (typeof json[0][0] === 'string' && json[0][0].toLowerCase().includes('mês')) {
+                        json.shift();
+                    }
+
+                    ALL_DATA = json.filter(row => row.length > 2 && row[2]).map(row => {
+                        const rawUf = row[8] ? String(row[8]).trim().toUpperCase() : '';
+                        const ufNorm = UF_NORMALIZER[rawUf] || rawUf;
+
+                        return {
+                            mes: parseExcelDate(row[0]),
+                            dataAbertura: parseExcelDate(row[1]),
+                            chamado: String(row[2] || ''),
+                            serial: String(row[3] || ''),
+                            modelo: String(row[4] || ''),
+                            posto: String(row[5] || ''),
+                            cliente: String(row[6] || ''),
+                            sla: String(row[7] || ''),
+                            uf: ufNorm,
+                            problema: String(row[9] || ''),
+                            dataEncerramento: parseExcelDate(row[10]),
+                            status: String(row[11] || 'OUTROS').trim().toUpperCase(),
+                            solucao: String(row[12] || '')
+                        };
+                    });
+
+                    populateFilterOptions();
+                    applyFilters();
+                } catch (err) {
+                    console.error("Erro ao ler Excel:", err);
+                    alert("Erro ao ler o arquivo Excel. Verifique o formato da planilha.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
         }
 
-        function processRawData(dataRows) {
-            ALL_DATA = dataRows.map(row => {
-                let mesStr = row[0];
-                let mesNome = MONTH_MAP[mesStr] || mesStr;
-                let rawUf = row[8] ? row[8].toString().trim().toUpperCase() : '';
-                let ufNorm = UF_NORMALIZER[rawUf] || rawUf;
-
-                return {
-                    mesOriginal: mesStr,
-                    mes: mesNome,
-                    dataAbertura: row[1],
-                    chamado: row[2],
-                    serial: row[3],
-                    modelo: row[4],
-                    posto: row[5],
-                    cliente: row[6],
-                    sla: row[7],
-                    uf: ufNorm,
-                    ufOriginal: rawUf,
-                    problema: row[9],
-                    dataEncerramento: row[10],
-                    status: row[11] ? row[11].toString().trim().toUpperCase() : 'OUTROS',
-                    solucao: row[12]
-                };
-            });
-
-            applyFilters();
-            setupMapEvents();
-        }
-
-        // TEMA ESCURO / CLARO
-        function toggleTheme() {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            html.setAttribute('data-theme', newTheme);
-
-            const icon = document.getElementById('theme-icon');
-            const text = document.getElementById('theme-text');
-            if (newTheme === 'dark') {
-                icon.className = 'fa-solid fa-sun';
-                text.textContent = 'Modo Claro';
-            } else {
-                icon.className = 'fa-solid fa-moon';
-                text.textContent = 'Modo Escuro';
+        function parseExcelDate(val) {
+            if (!val) return '';
+            if (val instanceof Date) return val.toISOString().split('T')[0];
+            if (typeof val === 'number') {
+                const dateObj = new Date((val - (25567 + 2)) * 86400 * 1000);
+                return dateObj.toISOString().split('T')[0];
             }
-            updateCharts();
+            return String(val).split(' ')[0];
         }
 
-        // NAVEGAÇÃO DE ABAS (SPA)
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        function populateFilterOptions() {
+            const meses = [...new Set(ALL_DATA.map(d => d.mes))].filter(Boolean).sort();
+            const filterPeriodo = document.getElementById('filter-periodo');
+            filterPeriodo.innerHTML = '<option value="TODOS">Todos os Meses</option>' + 
+                meses.map(m => `<option value="${m}">${m}</option>`).join('');
 
-            btn.classList.add('active');
-            document.getElementById(`tab-${tabId}`).classList.add('active');
+            const statusList = [...new Set(ALL_DATA.map(d => d.status))].filter(Boolean).sort();
+            const filterStatus = document.getElementById('filter-status');
+            filterStatus.innerHTML = '<option value="TODOS">Todos os Status</option>' + 
+                statusList.map(s => `<option value="${s}">${s}</option>`).join('');
         }
 
-        // APLICAÇÃO DOS FILTROS GLOBAIS
         function applyFilters() {
             const periodo = document.getElementById('filter-periodo').value;
             const status = document.getElementById('filter-status').value;
@@ -1108,7 +882,6 @@
             renderModeloTab();
         }
 
-        // 1. RENDERIZAR VISÃO GERAL
         function renderVisaoGeral() {
             const total = FILTERED_DATA.length;
             const encerrados = FILTERED_DATA.filter(d => d.status === 'ENCERRADO').length;
@@ -1119,10 +892,14 @@
             document.getElementById('kpi-encerrados').textContent = encerrados;
             document.getElementById('kpi-abertos').textContent = abertos;
             document.getElementById('kpi-taxa').textContent = `${taxa}%`;
-
-            // Tabela Visão Geral
             document.getElementById('count-geral').textContent = total;
+
             const tbody = document.getElementById('tbody-geral');
+            if (total === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-notice">Nenhum registro encontrado.</td></tr>';
+                return;
+            }
+
             tbody.innerHTML = FILTERED_DATA.map(d => `
                 <tr>
                     <td><strong>#${d.chamado}</strong></td>
@@ -1141,23 +918,16 @@
             updateCharts();
         }
 
-        // GRÁFICOS
         function updateCharts() {
             if (!FILTERED_DATA) return;
 
             // Chart Meses
             const mesesCount = {};
             FILTERED_DATA.forEach(d => { mesesCount[d.mes] = (mesesCount[d.mes] || 0) + 1; });
-            const labelsMeses = Object.keys(mesesCount);
-            const dataMeses = Object.values(mesesCount);
-
             if (chartMeses) chartMeses.destroy();
             chartMeses = new Chart(document.getElementById('chart-meses'), {
                 type: 'bar',
-                data: {
-                    labels: labelsMeses,
-                    datasets: [{ label: 'Chamados', data: dataMeses, backgroundColor: '#2563eb' }]
-                },
+                data: { labels: Object.keys(mesesCount), datasets: [{ label: 'Chamados', data: Object.values(mesesCount), backgroundColor: '#2563eb' }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
@@ -1167,25 +937,18 @@
             if (chartStatus) chartStatus.destroy();
             chartStatus = new Chart(document.getElementById('chart-status'), {
                 type: 'doughnut',
-                data: {
-                    labels: Object.keys(statusCount),
-                    datasets: [{ data: Object.values(statusCount), backgroundColor: ['#16a34a', '#dc2626', '#eab308'] }]
-                },
+                data: { labels: Object.keys(statusCount), datasets: [{ data: Object.values(statusCount), backgroundColor: ['#16a34a', '#dc2626', '#eab308'] }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Top 5 Postos
+            // Top Postos
             const postosCount = {};
             FILTERED_DATA.forEach(d => { postosCount[d.posto] = (postosCount[d.posto] || 0) + 1; });
             const topPostos = Object.entries(postosCount).sort((a,b) => b[1] - a[1]).slice(0, 5);
-
             if (chartTopPostos) chartTopPostos.destroy();
             chartTopPostos = new Chart(document.getElementById('chart-top-postos'), {
                 type: 'bar',
-                data: {
-                    labels: topPostos.map(p => p[0].length > 18 ? p[0].substring(0, 18) + '...' : p[0]),
-                    datasets: [{ label: 'Chamados', data: topPostos.map(p => p[1]), backgroundColor: '#3b82f6' }]
-                },
+                data: { labels: topPostos.map(p => p[0]), datasets: [{ label: 'Chamados', data: topPostos.map(p => p[1]), backgroundColor: '#3b82f6' }] },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
             });
 
@@ -1195,32 +958,24 @@
             if (chartModelos) chartModelos.destroy();
             chartModelos = new Chart(document.getElementById('chart-modelos'), {
                 type: 'pie',
-                data: {
-                    labels: Object.keys(modelosCount),
-                    datasets: [{ data: Object.values(modelosCount), backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1'] }]
-                },
+                data: { labels: Object.keys(modelosCount), datasets: [{ data: Object.values(modelosCount), backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'] }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
         }
 
-        // 2. ABA POR REGIÃO & MAPA
+        // MAPA
         function setupMapEvents() {
             const tooltip = document.getElementById('map-tooltip');
             document.querySelectorAll('.uf-group').forEach(group => {
                 const uf = group.getAttribute('data-uf');
-
                 group.addEventListener('mousemove', (e) => {
                     const ufCount = FILTERED_DATA.filter(d => d.uf === uf).length;
                     tooltip.style.display = 'block';
                     tooltip.style.left = (e.pageX + 10) + 'px';
                     tooltip.style.top = (e.pageY + 10) + 'px';
-                    tooltip.innerHTML = `<strong>Estado: ${uf}</strong><br/>Chamados: ${ufCount}`;
+                    tooltip.innerHTML = `<strong>${uf}</strong><br/>Chamados: ${ufCount}`;
                 });
-
-                group.addEventListener('mouseleave', () => {
-                    tooltip.style.display = 'none';
-                });
-
+                group.addEventListener('mouseleave', () => tooltip.style.display = 'none');
                 group.addEventListener('click', () => {
                     document.querySelectorAll('.uf-path').forEach(p => p.classList.remove('active-uf'));
                     const path = group.querySelector('.uf-path');
@@ -1231,24 +986,14 @@
             });
         }
 
-        function renderRegiaoTab() {
-            if (selectedUF) {
-                renderRegiaoDetail(selectedUF);
-            }
-        }
+        function renderRegiaoTab() { if (selectedUF) renderRegiaoDetail(selectedUF); }
 
         function renderRegiaoDetail(uf) {
             const items = FILTERED_DATA.filter(d => d.uf === uf);
-            document.getElementById('title-regiao-detail').innerHTML = `<i class="fa-solid fa-location-dot"></i> Estado de ${uf} - Chamados Detalhados`;
+            document.getElementById('title-regiao-detail').innerHTML = `<i class="fa-solid fa-location-dot"></i> Estado: ${uf}`;
             document.getElementById('badge-uf-count').textContent = `${items.length} chamados`;
-
             const tbody = document.getElementById('tbody-regiao');
-            if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhum chamado encontrado para ${uf} com os filtros atuais.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = items.map(d => `
+            tbody.innerHTML = items.length ? items.map(d => `
                 <tr>
                     <td><strong>#${d.chamado}</strong></td>
                     <td>${d.posto}</td>
@@ -1256,39 +1001,30 @@
                     <td>${d.modelo}</td>
                     <td>${getStatusBadge(d.status)}</td>
                 </tr>
-            `).join('');
+            `).join('') : '<tr><td colspan="5" style="text-align: center;">Nenhum chamado neste estado.</td></tr>';
         }
 
-        // 3. ABA POR POSTO
+        // ABAS POSTO, CLIENTE, MODELO
         function renderPostoTab() {
-            const postosMap = {};
-            FILTERED_DATA.forEach(d => {
-                if (!postosMap[d.posto]) {
-                    postosMap[d.posto] = { nome: d.posto, uf: d.uf, total: 0 };
-                }
-                postosMap[d.posto].total++;
-            });
-
-            const sorted = Object.values(postosMap).sort((a,b) => b.total - a.total);
+            const map = {};
+            FILTERED_DATA.forEach(d => { map[d.posto] = map[d.posto] || { nome: d.posto, uf: d.uf, total: 0 }; map[d.posto].total++; });
             const tbody = document.getElementById('tbody-posto-summary');
-            tbody.innerHTML = sorted.map(p => `
-                <tr class="clickable-row" onclick="openPostoDetail('${escapeQuotes(p.nome)}')">
+            tbody.innerHTML = Object.values(map).sort((a,b) => b.total - a.total).map(p => `
+                <tr>
                     <td><strong>${p.nome}</strong></td>
                     <td><span class="badge">${p.uf}</span></td>
                     <td><strong>${p.total}</strong></td>
-                    <td><button class="btn-back" style="padding: 0.2rem 0.5rem;"><i class="fa-solid fa-eye"></i> Detalhar</button></td>
+                    <td><button class="btn-back" onclick="openPostoDetail('${escapeQuotes(p.nome)}')">Detalhar</button></td>
                 </tr>
             `).join('');
         }
 
-        function openPostoDetail(postoNome) {
+        function openPostoDetail(nome) {
             document.getElementById('posto-summary-view').style.display = 'none';
             document.getElementById('posto-detail-view').style.display = 'block';
-            document.getElementById('posto-detail-title').innerHTML = `<i class="fa-solid fa-store"></i> Detalhes do Posto: ${postoNome}`;
-
-            const items = FILTERED_DATA.filter(d => d.posto === postoNome);
-            const tbody = document.getElementById('tbody-posto-detail');
-            tbody.innerHTML = items.map(d => `
+            document.getElementById('posto-detail-title').textContent = `Posto: ${nome}`;
+            const items = FILTERED_DATA.filter(d => d.posto === nome);
+            document.getElementById('tbody-posto-detail').innerHTML = items.map(d => `
                 <tr>
                     <td><strong>#${d.chamado}</strong></td>
                     <td>${formatDate(d.dataAbertura)}</td>
@@ -1297,45 +1033,33 @@
                     <td>${d.serial}</td>
                     <td>${d.problema}</td>
                     <td>${getStatusBadge(d.status)}</td>
-                    <td>${d.solucao || '-'}</td>
                 </tr>
             `).join('');
         }
-
         function closePostoDetail() {
             document.getElementById('posto-summary-view').style.display = 'block';
             document.getElementById('posto-detail-view').style.display = 'none';
         }
 
-        // 4. ABA POR CLIENTE
         function renderClienteTab() {
-            const clienteMap = {};
-            FILTERED_DATA.forEach(d => {
-                if (!clienteMap[d.cliente]) {
-                    clienteMap[d.cliente] = { nome: d.cliente, total: 0 };
-                }
-                clienteMap[d.cliente].total++;
-            });
-
-            const sorted = Object.values(clienteMap).sort((a,b) => b.total - a.total);
+            const map = {};
+            FILTERED_DATA.forEach(d => { map[d.cliente] = map[d.cliente] || { nome: d.cliente, total: 0 }; map[d.cliente].total++; });
             const tbody = document.getElementById('tbody-cliente-summary');
-            tbody.innerHTML = sorted.map(c => `
-                <tr class="clickable-row" onclick="openClienteDetail('${escapeQuotes(c.nome)}')">
+            tbody.innerHTML = Object.values(map).sort((a,b) => b.total - a.total).map(c => `
+                <tr>
                     <td><strong>${c.nome}</strong></td>
                     <td><strong>${c.total}</strong></td>
-                    <td><button class="btn-back" style="padding: 0.2rem 0.5rem;"><i class="fa-solid fa-eye"></i> Detalhar</button></td>
+                    <td><button class="btn-back" onclick="openClienteDetail('${escapeQuotes(c.nome)}')">Detalhar</button></td>
                 </tr>
             `).join('');
         }
 
-        function openClienteDetail(clienteNome) {
+        function openClienteDetail(nome) {
             document.getElementById('cliente-summary-view').style.display = 'none';
             document.getElementById('cliente-detail-view').style.display = 'block';
-            document.getElementById('cliente-detail-title').innerHTML = `<i class="fa-solid fa-building"></i> Detalhes do Cliente: ${clienteNome}`;
-
-            const items = FILTERED_DATA.filter(d => d.cliente === clienteNome);
-            const tbody = document.getElementById('tbody-cliente-detail');
-            tbody.innerHTML = items.map(d => `
+            document.getElementById('cliente-detail-title').textContent = `Cliente: ${nome}`;
+            const items = FILTERED_DATA.filter(d => d.cliente === nome);
+            document.getElementById('tbody-cliente-detail').innerHTML = items.map(d => `
                 <tr>
                     <td><strong>#${d.chamado}</strong></td>
                     <td>${formatDate(d.dataAbertura)}</td>
@@ -1344,45 +1068,33 @@
                     <td>${d.modelo}</td>
                     <td>${d.problema}</td>
                     <td>${getStatusBadge(d.status)}</td>
-                    <td>${d.solucao || '-'}</td>
                 </tr>
             `).join('');
         }
-
         function closeClienteDetail() {
             document.getElementById('cliente-summary-view').style.display = 'block';
             document.getElementById('cliente-detail-view').style.display = 'none';
         }
 
-        // 5. ABA POR MODELO
         function renderModeloTab() {
-            const modeloMap = {};
-            FILTERED_DATA.forEach(d => {
-                if (!modeloMap[d.modelo]) {
-                    modeloMap[d.modelo] = { nome: d.modelo, total: 0 };
-                }
-                modeloMap[d.modelo].total++;
-            });
-
-            const sorted = Object.values(modeloMap).sort((a,b) => b.total - a.total);
+            const map = {};
+            FILTERED_DATA.forEach(d => { map[d.modelo] = map[d.modelo] || { nome: d.modelo, total: 0 }; map[d.modelo].total++; });
             const tbody = document.getElementById('tbody-modelo-summary');
-            tbody.innerHTML = sorted.map(m => `
-                <tr class="clickable-row" onclick="openModeloDetail('${escapeQuotes(m.nome)}')">
+            tbody.innerHTML = Object.values(map).sort((a,b) => b.total - a.total).map(m => `
+                <tr>
                     <td><strong>${m.nome}</strong></td>
                     <td><strong>${m.total}</strong></td>
-                    <td><button class="btn-back" style="padding: 0.2rem 0.5rem;"><i class="fa-solid fa-eye"></i> Detalhar</button></td>
+                    <td><button class="btn-back" onclick="openModeloDetail('${escapeQuotes(m.nome)}')">Detalhar</button></td>
                 </tr>
             `).join('');
         }
 
-        function openModeloDetail(modeloNome) {
+        function openModeloDetail(nome) {
             document.getElementById('modelo-summary-view').style.display = 'none';
             document.getElementById('modelo-detail-view').style.display = 'block';
-            document.getElementById('modelo-detail-title').innerHTML = `<i class="fa-solid fa-microchip"></i> Detalhes do Modelo: ${modeloNome}`;
-
-            const items = FILTERED_DATA.filter(d => d.modelo === modeloNome);
-            const tbody = document.getElementById('tbody-modelo-detail');
-            tbody.innerHTML = items.map(d => `
+            document.getElementById('modelo-detail-title').textContent = `Modelo: ${nome}`;
+            const items = FILTERED_DATA.filter(d => d.modelo === nome);
+            document.getElementById('tbody-modelo-detail').innerHTML = items.map(d => `
                 <tr>
                     <td><strong>#${d.chamado}</strong></td>
                     <td>${formatDate(d.dataAbertura)}</td>
@@ -1391,106 +1103,46 @@
                     <td>${d.serial}</td>
                     <td>${d.problema}</td>
                     <td>${getStatusBadge(d.status)}</td>
-                    <td>${d.solucao || '-'}</td>
                 </tr>
             `).join('');
         }
-
         function closeModeloDetail() {
             document.getElementById('modelo-summary-view').style.display = 'block';
             document.getElementById('modelo-detail-view').style.display = 'none';
         }
 
         // UTILS
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const newTheme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            document.getElementById('theme-icon').className = newTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            document.getElementById('theme-text').textContent = newTheme === 'dark' ? 'Modo Claro' : 'Modo Escuro';
+            updateCharts();
+        }
+
         function getStatusBadge(status) {
-            if (status === 'ENCERRADO') {
-                return `<span class="badge badge-closed"><i class="fa-solid fa-check"></i> Encerrado</span>`;
-            } else {
-                return `<span class="badge badge-open"><i class="fa-solid fa-clock"></i> Aberto</span>`;
-            }
+            return status === 'ENCERRADO' 
+                ? '<span class="badge badge-closed">Encerrado</span>' 
+                : '<span class="badge badge-open">Aberto</span>';
         }
 
         function formatDate(dateStr) {
             if (!dateStr) return '-';
             const parts = dateStr.split(' ')[0].split('-');
-            if (parts.length === 3) {
-                return `${parts[2]}/${parts[1]}/${parts[0]}`;
-            }
-            return dateStr;
+            return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateStr;
         }
 
         function escapeQuotes(str) {
             return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         }
     </script>
-<!-- Biblioteca para leitura de arquivos Excel no navegador -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
-    // Função para processar o upload do arquivo Excel
-function handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-
-            // Pega a primeira aba da planilha
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-
-            // Converte a aba em matriz de dados (array de arrays)
-            const rawMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-            // Remove a primeira linha se for o cabeçalho (nomes das colunas)
-            if (rawMatrix.length > 0 && typeof rawMatrix[0][0] === 'string' && rawMatrix[0][0].toLowerCase().includes('mês')) {
-                rawMatrix.shift();
-            }
-
-            // Normaliza as datas/textos de cada linha para o formato esperado pelo dashboard
-            const processedRows = rawMatrix.filter(row => row.length > 0 && row[2]).map(row => {
-                // Formatação simples para garantir campos de data como YYYY-MM-DD
-                const formatExcelDate = (val) => {
-                    if (!val) return '';
-                    if (val instanceof Date) return val.toISOString().split('T')[0];
-                    if (typeof val === 'number') {
-                        const dateObj = new Date((val - (25567 + 2)) * 86400 * 1000);
-                        return dateObj.toISOString().split('T')[0];
-                    }
-                    return String(val).split(' ')[0];
-                };
-
-                return [
-                    formatExcelDate(row[0]), // MÊS
-                    formatExcelDate(row[1]), // DATA DE ABERTURA
-                    String(row[2] || ''),    // CHAMADO
-                    String(row[3] || ''),    // SERIAL
-                    String(row[4] || ''),    // MODELO
-                    String(row[5] || ''),    // POSTO
-                    String(row[6] || ''),    // CLIENTE
-                    String(row[7] || ''),    // SLA
-                    String(row[8] || ''),    // UF
-                    String(row[9] || ''),    // PROBLEMA
-                    formatExcelDate(row[10]),// DATA DE ENCERRAMENTO
-                    String(row[11] || ''),   // STATUS
-                    String(row[12] || '')    // SOLUÇÃO
-                ];
-            });
-
-            // Atualiza os dados do dashboard e re-renderiza as abas e gráficos
-            processRawData(processedRows);
-
-            alert(`Planilha carregada com sucesso! Total de ${processedRows.length} chamados processados.`);
-        } catch (error) {
-            console.error("Erro ao ler a planilha:", error);
-            alert("Ocorreu um erro ao processar o arquivo Excel. Verifique se o formato das colunas está correto.");
-        }
-    };
-
-    reader.readAsArrayBuffer(file);
-}
-</script>
 </body>
 </html>
