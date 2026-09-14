@@ -1,235 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR" class="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Executivo de Chamados 2026</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
-        }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        
-        .state-group { cursor: pointer; }
-        .state-path { fill: #e2e8f0; stroke: #ffffff; stroke-width: 1.5; transition: all 0.2s ease; }
-        .state-group:hover .state-path { fill: #0284c7 !important; filter: drop-shadow(0px 3px 8px rgba(2, 132, 199, 0.4)); }
-        .state-group.active .state-path { fill: #0369a1 !important; stroke: #38bdf8 !important; stroke-width: 2.5; }
-        .state-group.has-data .state-path { fill: #bae6fd; }
-        .state-label { font-size: 11px; font-weight: 800; fill: #0f172a; pointer-events: none; user-select: none; text-anchor: middle; dominant-baseline: central; }
-        .state-group:hover .state-label, .state-group.active .state-label { fill: #ffffff !important; }
-        
-        #map-tooltip { position: absolute; display: none; pointer-events: none; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15); }
-    </style>
-</head>
-<body class="bg-slate-100 text-slate-800 min-h-screen antialiased flex flex-col">
-
-    <div class="flex h-screen w-screen overflow-hidden">
-        
-        <!-- SIDEBAR -->
-        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 shadow-sm z-20">
-            <div>
-                <div class="p-5 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
-                    <div class="p-2.5 bg-brand-600 text-white rounded-xl shadow-sm">
-                        <i class="fa-solid fa-chart-line text-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="font-bold text-slate-900 text-sm tracking-tight leading-tight">Painel de Chamados</h1>
-                        <p class="text-xs text-slate-500 font-medium">Relatório Visual 2026</p>
-                    </div>
-                </div>
-
-                <nav class="p-3 space-y-1.5">
-                    <button onclick="switchTab('geral')" id="nav-geral" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-brand-600 text-white shadow-sm">
-                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
-                        <span>Visão Geral</span>
-                    </button>
-
-                    <button onclick="switchTab('regiao')" id="nav-regiao" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all">
-                        <i class="fa-solid fa-map-location-dot w-5 text-center"></i>
-                        <span>Por Regiões / Mapa</span>
-                    </button>
-
-                    <button onclick="switchTab('modelo')" id="nav-modelo" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all">
-                        <i class="fa-solid fa-truck-front w-5 text-center"></i>
-                        <span>Por Modelo de Veículo</span>
-                    </button>
-
-                    <button onclick="switchTab('cliente')" id="nav-cliente" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all">
-                        <i class="fa-solid fa-building w-5 text-center"></i>
-                        <span>Por Cliente</span>
-                    </button>
-
-                    <button onclick="switchTab('posto')" id="nav-posto" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all">
-                        <i class="fa-solid fa-location-dot w-5 text-center"></i>
-                        <span>Por Posto</span>
-                    </button>
-                </nav>
-            </div>
-
-            <div class="p-4 border-t border-slate-100 bg-slate-50/50 space-y-3">
-                <div class="bg-white p-3 rounded-xl border border-slate-200 text-xs space-y-1.5">
-                    <div class="flex justify-between text-slate-500">
-                        <span>Total de Registros:</span>
-                        <span id="sidebar-total-count" class="font-bold text-slate-800">1,291</span>
-                    </div>
-                    <div class="flex justify-between text-slate-500">
-                        <span>Base de Dados:</span>
-                        <span class="font-bold text-emerald-600"><i class="fa-solid fa-circle-check"></i> 100% Atualizada</span>
-                    </div>
-                </div>
-
-                <div class="text-center">
-                    <span class="text-[11px] text-slate-400">Modo de Exibição: <strong>Web Desktop</strong></span>
-                </div>
-            </div>
-        </aside>
-
-        <!-- MAIN AREA -->
-        <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-slate-50">
-            
-            <!-- HEADER -->
-            <header class="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-10 shadow-2xs flex flex-wrap items-center justify-between gap-4">
-                <div>
-                    <h2 id="page-title" class="text-lg font-bold text-slate-800 tracking-tight">Visão Geral Executiva</h2>
-                    <p class="text-xs text-slate-500">Acompanhamento e análise estratégica de chamados</p>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-3 text-xs">
-                    <div class="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200">
-                        <i class="fa-regular fa-calendar-days text-brand-600"></i>
-                        <label for="filter-mes" class="font-semibold text-slate-600">Período/Mês:</label>
-                        <select id="filter-mes" onchange="applyGlobalFilters()" class="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer">
-                            <option value="ALL">Todos os Períodos / Meses</option><option value="2026-01">2026-01</option><option value="2026-02">2026-02</option><option value="2026-03">2026-03</option><option value="2026-04">2026-04</option><option value="2026-05">2026-05</option><option value="2026-06">2026-06</option><option value="2026-07">2026-07</option><option value="2026-08">2026-08</option>
-                        </select>
-                    </div>
-
-                    <div class="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200">
-                        <i class="fa-solid fa-filter text-brand-600"></i>
-                        <label for="filter-status" class="font-semibold text-slate-600">Status:</label>
-                        <select id="filter-status" onchange="applyGlobalFilters()" class="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer">
-                            <option value="ALL">Todos os Status</option>
-                            <option value="ENCERRADO">Encerrados</option>
-                            <option value="ABERTO">Abertos</option>
-                        </select>
-                    </div>
-
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass text-slate-400 absolute left-3 top-2.5"></i>
-                        <input id="filter-search" type="text" onkeyup="applyGlobalFilters()" placeholder="Buscar cliente, chamado, posto, modelo..." class="bg-slate-100 border border-slate-200 rounded-xl pl-8 pr-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500 w-64">
-                    </div>
-
-                    <button onclick="resetFilters()" class="px-3.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold transition-all">
-                        <i class="fa-solid fa-rotate-left mr-1"></i> Limpar Filtros
-                    </button>
-                </div>
-            </header>
-
-            <!-- TAB CONTAINER -->
-            <div class="p-6 space-y-6 flex-1">
-
-                <!-- 1. TAB: VISÃO GERAL -->
-                <div id="tab-geral" class="tab-content space-y-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total de Chamados</p>
-                                <h3 id="kpi-total" class="text-3xl font-extrabold text-slate-900 mt-1">0</h3>
-                                <p class="text-xs text-slate-500 mt-1">Base completa de registros</p>
-                            </div>
-                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl font-bold">
-                                <i class="fa-solid fa-headset"></i>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Chamados Abertos</p>
-                                <h3 id="kpi-abertos" class="text-3xl font-extrabold text-amber-600 mt-1">0</h3>
-                                <p class="text-xs text-amber-600/80 mt-1 font-medium">Requer atenção imediata</p>
-                            </div>
-                            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl font-bold">
-                                <i class="fa-solid fa-triangle-exclamation"></i>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Taxa de Resolução</p>
-                                <h3 id="kpi-taxa" class="text-3xl font-extrabold text-emerald-600 mt-1">0%</h3>
-                                <p class="text-xs text-emerald-600/80 mt-1 font-medium">Chamados encerrados</p>
-                            </div>
-                            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl font-bold">
-                                <i class="fa-solid fa-circle-check"></i>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-                            <div>
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">SLA Médio Real</p>
-                                <h3 id="kpi-sla" class="text-3xl font-extrabold text-brand-600 mt-1">0 dias</h3>
-                                <p class="text-xs text-slate-500 mt-1">Tempo médio de solução</p>
-                            </div>
-                            <div class="w-12 h-12 bg-sky-50 text-brand-600 rounded-2xl flex items-center justify-center text-xl font-bold">
-                                <i class="fa-solid fa-stopwatch"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs lg:col-span-2">
-                            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <i class="fa-solid fa-chart-bar text-brand-600"></i>
-                                Principais Problemas Relatados
-                            </h3>
-                            <div class="h-64">
-                                <canvas id="chart-problemas"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-                            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                <i class="fa-solid fa-chart-pie text-brand-600"></i>
-                                Distribuição de Status
-                            </h3>
-                            <div class="h-64 flex items-center justify-center">
-                                <canvas id="chart-status"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-                            <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center justify-between">
-                                <span class="flex items-center gap-2"><i class="fa-solid fa-building text-brand-600"></i> Top 5 Clientes com Mais Chamados</span>
+com Mais Chamados</span>
                                 <span class="text-xs text-slate-400 font-normal">Qtd. Chamados</span>
                             </h3>
                             <div id="top-clientes-list" class="space-y-2"></div>
@@ -245,7 +14,7 @@
                     </div>
                 </div>
 
-                <!-- 2. TAB: REGIÕES (MAPA) -->
+                <!-- 2. TAB: REGIÕES (MAPA DO BRASIL) -->
                 <div id="tab-regiao" class="tab-content hidden space-y-6">
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                         <div class="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs relative">
@@ -385,7 +154,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs lg:col-span-1">
                             <h3 class="text-sm font-bold text-slate-800 mb-4">Volume por Modelo</h3>
-                            <div class="h-64">
+                            <div class="h-64 relative">
                                 <canvas id="chart-modelos"></canvas>
                             </div>
                         </div>
@@ -520,10 +289,12 @@
         let selectedCliente = 'ALL';
         let selectedPosto = 'ALL';
 
-        let chartProblemas, chartStatus, chartModelos;
+        let chartProblemas = null;
+        let chartStatus = null;
+        let chartModelos = null;
 
         function escapeHtml(str) {
-            if (!str) return '';
+            if (str === null || str === undefined) return '';
             return String(str)
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
@@ -535,7 +306,8 @@
         function switchTab(tabId) {
             currentTab = tabId;
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            const target = document.getElementById('tab-' + tabId);
+            if (target) target.classList.remove('hidden');
 
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('bg-brand-600', 'text-white', 'shadow-sm');
@@ -555,7 +327,8 @@
                 'cliente': 'Análise por Cliente',
                 'posto': 'Análise por Posto de Atendimento'
             };
-            document.getElementById('page-title').innerText = titles[tabId] || '';
+            const titleEl = document.getElementById('page-title');
+            if (titleEl) titleEl.innerText = titles[tabId] || 'Painel de Chamados';
 
             renderDashboard();
         }
@@ -599,7 +372,8 @@
         }
 
         function renderDashboard() {
-            document.getElementById('sidebar-total-count').innerText = currentData.length.toLocaleString('pt-BR');
+            const sideCount = document.getElementById('sidebar-total-count');
+            if (sideCount) sideCount.innerText = currentData.length.toLocaleString('pt-BR');
 
             if (currentTab === 'geral') renderTabGeral();
             if (currentTab === 'regiao') renderTabRegiao();
@@ -623,6 +397,7 @@
             document.getElementById('kpi-taxa').innerText = taxa + '%';
             document.getElementById('kpi-sla').innerText = avgSla + ' dias';
 
+            // Top Problemas Chart
             const probCounts = {};
             currentData.forEach(d => {
                 const p = d.prob_real || 'NÃO ESPECIFICADO';
@@ -631,48 +406,53 @@
 
             const sortedProbs = Object.entries(probCounts).sort((a,b) => b[1] - a[1]).slice(0, 7);
             
-            if (chartProblemas) chartProblemas.destroy();
-            const ctxP = document.getElementById('chart-problemas').getContext('2d');
-            chartProblemas = new Chart(ctxP, {
-                type: 'bar',
-                data: {
-                    labels: sortedProbs.map(x => x[0].length > 25 ? x[0].substring(0, 25)+'...' : x[0]),
-                    datasets: [{
-                        label: 'Quantidade',
-                        data: sortedProbs.map(x => x[1]),
-                        backgroundColor: '#0284c7',
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                        x: { grid: { display: false } }
+            try {
+                if (chartProblemas) chartProblemas.destroy();
+                const ctxP = document.getElementById('chart-problemas').getContext('2d');
+                chartProblemas = new Chart(ctxP, {
+                    type: 'bar',
+                    data: {
+                        labels: sortedProbs.map(x => x[0].length > 25 ? x[0].substring(0, 25)+'...' : x[0]),
+                        datasets: [{
+                            label: 'Quantidade',
+                            data: sortedProbs.map(x => x[1]),
+                            backgroundColor: '#0284c7',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                            x: { grid: { display: false } }
+                        }
                     }
-                }
-            });
+                });
+            } catch(e) { console.error("Chart error:", e); }
 
-            if (chartStatus) chartStatus.destroy();
-            const ctxS = document.getElementById('chart-status').getContext('2d');
-            chartStatus = new Chart(ctxS, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Encerrados', 'Abertos'],
-                    datasets: [{
-                        data: [encerrados, abertos],
-                        backgroundColor: ['#10b981', '#f59e0b']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
-                }
-            });
+            try {
+                if (chartStatus) chartStatus.destroy();
+                const ctxS = document.getElementById('chart-status').getContext('2d');
+                chartStatus = new Chart(ctxS, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Encerrados', 'Abertos'],
+                        datasets: [{
+                            data: [encerrados, abertos],
+                            backgroundColor: ['#10b981', '#f59e0b']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            } catch(e) { console.error("Chart error:", e); }
 
+            // Top Clientes
             const clienteCounts = {};
             currentData.forEach(d => { clienteCounts[d.cliente] = (clienteCounts[d.cliente] || 0) + 1; });
             const topClientes = Object.entries(clienteCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
@@ -689,6 +469,7 @@
             });
             document.getElementById('top-clientes-list').innerHTML = htmlClientes;
 
+            // Top Postos
             const postoCounts = {};
             currentData.forEach(d => { postoCounts[d.posto] = (postoCounts[d.posto] || 0) + 1; });
             const topPostos = Object.entries(postoCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
@@ -831,21 +612,23 @@
             });
             document.getElementById('modelos-cards-container').innerHTML = htmlCardsMod;
 
-            if (chartModelos) chartModelos.destroy();
-            const ctxM = document.getElementById('chart-modelos').getContext('2d');
-            chartModelos = new Chart(ctxM, {
-                type: 'bar',
-                data: {
-                    labels: sortedModelos.map(x => x[0]),
-                    datasets: [{
-                        label: 'Chamados',
-                        data: sortedModelos.map(x => x[1]),
-                        backgroundColor: '#38bdf8',
-                        borderRadius: 6
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
+            try {
+                if (chartModelos) chartModelos.destroy();
+                const ctxM = document.getElementById('chart-modelos').getContext('2d');
+                chartModelos = new Chart(ctxM, {
+                    type: 'bar',
+                    data: {
+                        labels: sortedModelos.map(x => x[0]),
+                        datasets: [{
+                            label: 'Chamados',
+                            data: sortedModelos.map(x => x[1]),
+                            backgroundColor: '#38bdf8',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            } catch(e) { console.error("Chart error:", e); }
 
             const modeloData = selectedModelo === 'ALL' ? currentData : currentData.filter(d => d.modelo === selectedModelo);
             document.getElementById('selected-modelo-title').innerText = selectedModelo;
@@ -875,7 +658,8 @@
 
         // ---------------- TAB 4: CLIENTE ----------------
         function renderClientesList() {
-            const search = (document.getElementById('search-cliente-input')?.value || '').toLowerCase();
+            const searchInput = document.getElementById('search-cliente-input');
+            const search = searchInput ? searchInput.value.toLowerCase() : '';
             const clienteCounts = {};
             currentData.forEach(d => { clienteCounts[d.cliente] = (clienteCounts[d.cliente] || 0) + 1; });
             
@@ -929,7 +713,8 @@
 
         // ---------------- TAB 5: POSTO ----------------
         function renderPostosList() {
-            const search = (document.getElementById('search-posto-input')?.value || '').toLowerCase();
+            const searchInput = document.getElementById('search-posto-input');
+            const search = searchInput ? searchInput.value.toLowerCase() : '';
             const postoCounts = {};
             currentData.forEach(d => { postoCounts[d.posto] = (postoCounts[d.posto] || 0) + 1; });
             
@@ -982,9 +767,10 @@
             renderTabPosto();
         }
 
-        window.onload = () => {
+        // Initialize application
+        window.addEventListener('DOMContentLoaded', () => {
             renderDashboard();
-        };
+        });
     </script>
 </body>
 </html>
